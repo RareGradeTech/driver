@@ -377,7 +377,27 @@
 
 <div id="authScreen">
     <div class="auth-bg-circles"><div class="auth-circle"></div><div class="auth-circle"></div><div class="auth-circle"></div></div>
-    <div class="auth-card">
+    
+    <div class="auth-card" id="initialGoogleCard" style="text-align:center;">
+        <div style="width: 64px; height: 64px; background: var(--accent-light); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid var(--accent-muted);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <img src="https://i.postimg.cc/65pML87d/1BUSKET-LOGO.png" alt="1BUSKET Logo" style="height:38px; width:auto; display:inline-block; margin-bottom:16px;">
+        <h2 style="font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:6px;">Driver Portal</h2>
+        <p style="font-size:0.86rem; color:var(--dim); line-height:1.5; margin-bottom:24px;">Verify your identity with Google to access the driver sign-in.</p>
+        
+        <div class="auth-error" id="initialGoogleError" style="display:none; text-align:left; margin-bottom:16px;"></div>
+        
+        <button class="btn-google" onclick="initialGoogleSignIn()" id="googleVerifyBtn" style="padding:14px 20px; font-size:0.95rem; width: 100%; margin-top:0;">
+            <div class="google-icon"></div>
+            Continue with Google
+        </button>
+        <p style="margin-top:16px; font-size:0.75rem; color:var(--text-muted);">
+            By continuing, you agree to 1BUSKET's driver terms.
+        </p>
+    </div>
+
+    <div class="auth-card" id="mainAuthCard" style="display:none;">
         <div class="auth-logo">
             <img src="https://i.postimg.cc/65pML87d/1BUSKET-LOGO.png" alt="1BUSKET Logo">
         </div>
@@ -664,6 +684,46 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 let DRIVER_KEY = null, driverData = null, ordersCache = {}, currentMapInstance = null, pendingDeleteOrderKey = null;
 let driverLat = null, driverLng = null, locationError = null, locationWatcher = null, locationBannerShown = false;
 let vendorCache = {};
+
+async function initialGoogleSignIn() {
+    const btn = document.getElementById('googleVerifyBtn');
+    const err = document.getElementById('initialGoogleError');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span style="opacity:.6;">Verifying…</span>';
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        const snap = await db.ref('drivers').orderByChild('email').equalTo(user.email).once('value');
+        if (!snap.val()) {
+            throw new Error('Access Denied. Your email is not registered in the admin dash.');
+        }
+
+        // Pre-fill email in register form just in case
+        const emailField = document.getElementById('reg-email');
+        if (emailField && user.email) emailField.value = user.email;
+
+        // Hide verification card, show main form
+        document.getElementById('initialGoogleCard').style.display = 'none';
+        document.getElementById('mainAuthCard').style.display = 'block';
+
+    } catch (e) {
+        btn.disabled = false;
+        btn.innerHTML = '<div class="google-icon"></div> Continue with Google';
+        
+        let msg = e.message || 'Google sign-in failed. Please try again.';
+        if (e.code === 'auth/popup-closed-by-user')  msg = 'Sign-in window was closed. Please try again.';
+        if (e.code === 'auth/popup-blocked')          msg = 'Pop-up was blocked. Please allow pop-ups for this site.';
+        
+        err.textContent = msg;
+        err.style.display = 'block';
+    }
+}
 
 async function getVendorAddressFromProfile(vendorKey) {
     if (!vendorKey) return null;
@@ -1105,6 +1165,10 @@ function confirmLogout(){
     document.getElementById('driverMainPanel').style.display='none';
     document.getElementById('mobileTopbar').style.display='none';
     document.getElementById('mobileBottomNav').style.display='none';
+    
+    document.getElementById('initialGoogleCard').style.display='block';
+    document.getElementById('mainAuthCard').style.display='none';
+    
     document.getElementById('authScreen').classList.remove('hidden');
     hideModal('logoutModal');lucide.createIcons();
 }
