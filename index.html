@@ -18,7 +18,7 @@
   --bg:#fafaf8;--surface:#ffffff;--surface2:#f5f4f1;
   --border:#e8e6e1;--border-strong:#d1cec7;
   --text:#1c1a17;--dim:#6b6560;--text-muted:#a09a92;
-  --danger:#d93025;--warning:#ff9500;--green:#1a7a4a;
+  --danger:#d93025;--warning:#ff9500;--green:#1a7a4a;--blue:#1a56a0;
   --sidebar-width:280px;--sidebar-collapsed:72px;
   --radius:16px;--radius-sm:10px;
   --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
@@ -33,25 +33,31 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 input[type="text"],input[type="email"],input[type="tel"],input[type="number"],input[type="password"],input[type="url"],input[type="time"],input[type="file"],select{border-radius:999px!important}
 textarea{border-radius:20px!important}
 
+/* OFFLINE BANNER */
+#offlineBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1c1a17,#2d2a24);color:white;padding:10px 20px;text-align:center;font-size:.82rem;font-weight:700;align-items:center;justify-content:center;gap:10px}
+#offlineBanner.show{display:flex}
+.offline-dot{width:8px;height:8px;border-radius:50%;background:#ff4444;animation:pulse-dot 1s infinite}
+
+/* BUSY MODE BANNER */
+#busyBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#ff9500,#e0821a);color:white;padding:10px 20px;font-size:.82rem;font-weight:700;align-items:center;justify-content:space-between;gap:10px}
+#busyBanner.show{display:flex}
+#busyBanner.offline-offset{top:40px}
+.busy-banner-left{display:flex;align-items:center;gap:8px}
+.busy-go-online-btn{background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.4);color:white;padding:5px 14px;border-radius:999px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;transition:background .2s}
+.busy-go-online-btn:hover{background:rgba(255,255,255,.4)}
+
 /* SHIMMER */
 #shimmerOverlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;transition:opacity .55s ease}
-#shimmerOverlay.active{display:flex}
-#shimmerOverlay.fade-out{opacity:0;pointer-events:none}
+#shimmerOverlay.active{display:flex}#shimmerOverlay.fade-out{opacity:0;pointer-events:none}
 .shim-sidebar{position:absolute;left:0;top:0;width:var(--sidebar-collapsed);height:100%;background:white;border-right:1px solid var(--border);padding:24px 12px;display:flex;flex-direction:column;gap:18px}
 .shim-main{margin-left:var(--sidebar-collapsed);flex:1;padding:40px;display:flex;flex-direction:column;gap:28px}
 .shim-block{border-radius:20px;background:linear-gradient(90deg,#e8eaed 25%,#f4f5f7 50%,#e8eaed 75%);background-size:400% 100%;animation:shimmerSlide 1.5s ease-in-out infinite}
 @keyframes shimmerSlide{0%{background-position:100% 0}100%{background-position:-100% 0}}
-.shim-header{height:44px;width:260px;border-radius:999px}
-.shim-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.shim-stat{height:110px;border-radius:20px}
-.shim-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.shim-card{height:200px;border-radius:20px}
+.shim-header{height:44px;width:260px;border-radius:999px}.shim-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.shim-stat{height:110px;border-radius:20px}.shim-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}.shim-card{height:200px;border-radius:20px}
 
 /* DESKTOP SIDEBAR */
 .sidebar{width:var(--sidebar-collapsed);background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;position:fixed;height:100vh;z-index:100;display:flex;flex-direction:column;transition:width 0.35s cubic-bezier(0.4,0,0.2,1);overflow:hidden}
@@ -80,6 +86,9 @@ textarea{border-radius:20px!important}
 .online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:pulse-dot 2s infinite}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
 
+/* BUSY STATUS DOT */
+.busy-dot{width:8px;height:8px;border-radius:50%;background:#ff9500;display:inline-block;margin-right:4px;animation:pulse-dot 1s infinite}
+
 /* MAIN PANEL */
 .main-panel{margin-left:var(--sidebar-collapsed);flex:1;padding:36px;max-width:calc(100% - var(--sidebar-collapsed));transition:margin-left 0.35s cubic-bezier(0.4,0,0.2,1),max-width 0.35s cubic-bezier(0.4,0,0.2,1)}
 .main-panel.shifted{margin-left:var(--sidebar-width);max-width:calc(100% - var(--sidebar-width))}
@@ -87,7 +96,7 @@ textarea{border-radius:20px!important}
 .page-content.active{display:block}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* DESKTOP HERO */
+/* HERO */
 .dashboard-hero{border-radius:24px;padding:28px 32px;margin-bottom:28px;background:var(--store-gradient);position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(255,117,31,.3)}
 .dashboard-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
 .dashboard-hero::after{content:'';position:absolute;bottom:-40px;right:80px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05)}
@@ -125,12 +134,10 @@ textarea{border-radius:20px!important}
 .btn-primary{background:var(--accent);color:white;border:none;padding:11px 20px;border-radius:999px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:var(--transition);box-shadow:0 4px 14px rgba(255,117,31,.35);font-family:inherit;font-size:.88rem}
 .btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 8px 22px rgba(255,117,31,.45)}
 .btn{padding:7px 14px;border-radius:999px;border:none;cursor:pointer;font-weight:600;transition:var(--transition);font-size:.8rem;display:inline-flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap}
-.btn-edit{background:var(--surface2);color:var(--text)}
-.btn-edit:hover{background:var(--border);transform:translateY(-1px)}
-.btn-danger{background:#fff1f0;color:var(--danger)}
-.btn-danger:hover{background:var(--danger);color:white;transform:translateY(-1px)}
-.btn-success{background:#edf9f2;color:var(--green)}
-.btn-success:hover{background:var(--green);color:white;transform:translateY(-1px)}
+.btn-edit{background:var(--surface2);color:var(--text)}.btn-edit:hover{background:var(--border);transform:translateY(-1px)}
+.btn-danger{background:#fff1f0;color:var(--danger)}.btn-danger:hover{background:var(--danger);color:white;transform:translateY(-1px)}
+.btn-success{background:#edf9f2;color:var(--green)}.btn-success:hover{background:var(--green);color:white;transform:translateY(-1px)}
+.btn-warning{background:#fef9c3;color:#a16207}.btn-warning:hover{background:#ff9500;color:white;transform:translateY(-1px)}
 
 /* MODALS */
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);backdrop-filter:blur(12px);z-index:2000;justify-content:center;align-items:center;opacity:0;transition:opacity .3s ease}
@@ -143,8 +150,7 @@ textarea{border-radius:20px!important}
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:15px 22px;border-radius:999px;box-shadow:var(--shadow-hover);display:flex;align-items:center;gap:12px;transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);z-index:3000;font-size:.9rem;font-weight:600;max-width:360px}
 .toast.show{transform:translateY(0);opacity:1}
-.toast.success{border-left:4px solid var(--green)}
-.toast.error{border-left:4px solid var(--danger)}
+.toast.success{border-left:4px solid var(--green)}.toast.error{border-left:4px solid var(--danger)}
 
 /* PROFILE */
 .profile-container{max-width:700px}
@@ -175,8 +181,16 @@ textarea{border-radius:20px!important}
 .settings-sub{font-size:.75rem;color:var(--dim);margin-top:2px}
 .toggle{width:46px;height:26px;border-radius:999px;background:var(--border);position:relative;cursor:pointer;transition:var(--transition);flex-shrink:0}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:var(--transition)}
-.toggle.on{background:var(--accent)}
-.toggle.on::after{transform:translateX(20px)}
+.toggle.on{background:var(--accent)}.toggle.on::after{transform:translateX(20px)}
+.toggle.busy-color.on{background:#ff9500}
+
+/* BUSY MODE SELECTOR */
+.busy-reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.busy-reason-btn{padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:var(--transition);font-family:inherit}
+.busy-reason-btn:hover{border-color:var(--warning);background:#fef9c3}
+.busy-reason-btn.selected{border-color:var(--warning);background:#fef9c3;box-shadow:0 0 0 3px rgba(255,149,0,.15)}
+.busy-reason-btn .reason-icon{font-size:1.6rem;margin-bottom:6px}
+.busy-reason-btn .reason-label{font-size:.82rem;font-weight:700;color:var(--text)}
 
 /* MAP */
 .map-container{width:100%;height:280px;border-radius:16px;overflow:hidden;margin-top:12px;border:1px solid var(--border)}
@@ -188,6 +202,67 @@ textarea{border-radius:20px!important}
 .addr-display.delivery{background:var(--accent-light);border:1px solid rgba(255,117,31,.2)}
 .addr-display.locked{background:#fef9c3;border:1px solid #fcd34d}
 
+/* ROUTE OPTIMIZATION CARD */
+.route-card{background:linear-gradient(135deg,#1c1a17,#2d2a24);border-radius:20px;padding:20px;margin-bottom:20px;color:white;position:relative;overflow:hidden}
+.route-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,117,31,.15)}
+.route-card-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.6);margin-bottom:10px}
+.route-card h3{font-size:1.05rem;font-weight:800;margin-bottom:16px}
+.route-stops{display:flex;flex-direction:column;gap:0}
+.route-stop{display:flex;align-items:flex-start;gap:12px;padding:8px 0;position:relative}
+.route-stop:not(:last-child)::after{content:'';position:absolute;left:13px;top:28px;width:2px;height:calc(100% - 10px);background:rgba(255,255,255,.2)}
+.route-stop-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0;z-index:1}
+.route-stop-num.pickup{background:#1a7a4a;color:white}
+.route-stop-num.delivery{background:var(--accent);color:white}
+.route-stop-info{flex:1}
+.route-stop-type{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.6;margin-bottom:2px}
+.route-stop-addr{font-size:.82rem;font-weight:600;line-height:1.4}
+.route-map-wrap{height:200px;border-radius:14px;overflow:hidden;margin-top:14px;border:1px solid rgba(255,255,255,.1)}
+#routeOptMap{width:100%;height:100%}
+
+/* PHOTO PROOF */
+.proof-upload-area{border:2.5px dashed var(--border);border-radius:20px;padding:32px;text-align:center;cursor:pointer;transition:var(--transition);background:var(--surface2);position:relative;margin:16px 0}
+.proof-upload-area:hover{border-color:var(--accent);background:var(--accent-light)}
+.proof-upload-area.has-photo{border-color:var(--green);background:#edf9f2;border-style:solid}
+.proof-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.proof-preview{width:100%;height:180px;object-fit:cover;border-radius:14px;display:none;margin-bottom:12px}
+.proof-preview.show{display:block}
+.proof-upload-icon{font-size:2.4rem;margin-bottom:8px}
+.proof-upload-label{font-size:.9rem;font-weight:700;color:var(--dim);margin-bottom:4px}
+.proof-upload-sub{font-size:.75rem;color:var(--text-muted)}
+.proof-uploading{display:none;align-items:center;gap:10px;justify-content:center;padding:12px 0;color:var(--accent);font-weight:600;font-size:.85rem}
+.proof-uploading.show{display:flex}
+
+/* LEADERBOARD */
+.leaderboard-container{max-width:700px}
+.leaderboard-header-card{background:linear-gradient(135deg,#1c1a17 0%,#3d3630 100%);border-radius:24px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden}
+.leaderboard-header-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,117,31,.12)}
+.leaderboard-header-card h2{color:white;font-size:1.4rem;font-weight:800;margin-bottom:4px;position:relative}
+.leaderboard-header-card p{color:rgba(255,255,255,.6);font-size:.84rem;position:relative}
+.leaderboard-province-filter{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.province-chip{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:.78rem;font-weight:700;color:var(--dim);transition:var(--transition);font-family:inherit}
+.province-chip:hover{border-color:var(--accent-muted);color:var(--accent)}
+.province-chip.active{background:var(--accent);border-color:var(--accent);color:white}
+.leaderboard-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:16px;margin-bottom:8px;background:white;border:1px solid var(--border);transition:var(--transition)}
+.leaderboard-row:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.leaderboard-row.is-me{background:var(--accent-light);border-color:var(--accent-muted);box-shadow:0 0 0 2px rgba(255,117,31,.15)}
+.leaderboard-row.rank-1{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d}
+.leaderboard-row.rank-2{background:linear-gradient(135deg,#f9fafb,#f1f5f9);border-color:#cbd5e1}
+.leaderboard-row.rank-3{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa}
+.leaderboard-rank{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+.rank-1 .leaderboard-rank{background:linear-gradient(135deg,#f59e0b,#d97706);color:white}
+.rank-2 .leaderboard-rank{background:linear-gradient(135deg,#94a3b8,#64748b);color:white}
+.rank-3 .leaderboard-rank{background:linear-gradient(135deg,#fb923c,#ea580c);color:white}
+.leaderboard-rank-default{background:var(--surface2);color:var(--dim)}
+.leaderboard-avatar{width:40px;height:40px;border-radius:12px;background:var(--store-gradient);color:white;font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.leaderboard-info{flex:1;min-width:0}
+.leaderboard-name{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leaderboard-sub{font-size:.72rem;color:var(--dim)}
+.leaderboard-score{text-align:right;flex-shrink:0}
+.leaderboard-deliveries{font-size:1.1rem;font-weight:800;color:var(--text)}
+.leaderboard-earn{font-size:.72rem;color:var(--green);font-weight:700}
+.you-badge{background:var(--accent);color:white;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:6px}
+.leaderboard-trophy{font-size:1.4rem}
+
 /* MISC */
 .empty-state{text-align:center;padding:48px 24px;color:var(--dim)}
 .history-card{background:white;border-radius:16px;padding:16px 20px;border:1px solid var(--border);margin-bottom:12px;transition:var(--transition)}
@@ -197,60 +272,28 @@ textarea{border-radius:20px!important}
 .location-banner.success{background:linear-gradient(135deg,#edf9f2,#bbf0d3);border-color:#86efac;color:#14532d}
 .location-banner.error{background:linear-gradient(135deg,#fff1f0,#fcd9d7);border-color:#fca5a5;color:#7f1d1d}
 
-/* ══════════════════════════════════════
+/* ══════════════════════════
    MOBILE STYLES
-══════════════════════════════════════ */
+══════════════════════════ */
 @media(min-width:769px){
   .mobile-topbar,.mobile-bottom-nav{display:none!important}
   .hero-stats-row{display:none!important}
   .mob-only{display:none!important}
   .dash-two-col{display:grid;grid-template-columns:1fr 340px;gap:20px}
 }
-
 @media(max-width:768px){
-  /* hide desktop chrome */
-  .sidebar{display:none!important}
-  .shim-sidebar{display:none!important}
+  .sidebar{display:none!important}.shim-sidebar{display:none!important}
   .shim-main{margin-left:0!important;padding:20px 16px!important}
-
-  /* main panel */
-  .main-panel{
-    margin-left:0!important;max-width:100%!important;
-    padding:calc(60px + 14px) 0 calc(var(--mobile-nav-h) + var(--safe-bottom) + 14px)!important;
-    display:block!important;
-  }
+  .main-panel{margin-left:0!important;max-width:100%!important;padding:calc(60px + 14px) 0 calc(var(--mobile-nav-h) + var(--safe-bottom) + 14px)!important;display:block!important}
   .main-panel.shifted{margin-left:0!important;max-width:100%!important}
-
-  /* MOBILE TOP BAR */
-  .mobile-topbar{
-    display:flex!important;align-items:center;justify-content:space-between;
-    padding:0 16px;background:var(--surface);
-    border-bottom:1px solid var(--border);
-    position:fixed;top:0;left:0;right:0;z-index:200;height:60px;
-    box-shadow:0 2px 12px rgba(0,0,0,.06);
-  }
+  .mobile-topbar{display:flex!important;align-items:center;justify-content:space-between;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;z-index:200;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
   .mob-logo-img{height:28px;width:auto;object-fit:contain}
   .mob-topbar-right{display:flex;align-items:center;gap:10px}
   .mob-loc{font-size:11px;color:var(--dim);font-weight:600;display:flex;align-items:center;gap:4px}
-  .mob-loc i{width:12px;height:12px}
   .mob-avatar{width:36px;height:36px;border-radius:10px;background:var(--store-gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .2s}
   .mob-avatar:active{transform:scale(.92)}
-
-  /* MOBILE BOTTOM NAV */
-  .mobile-bottom-nav{
-    display:flex!important;position:fixed;bottom:0;left:0;right:0;
-    height:calc(var(--mobile-nav-h) + var(--safe-bottom));
-    background:var(--surface);border-top:1px solid var(--border);
-    z-index:200;align-items:flex-start;padding-top:6px;
-    box-shadow:0 -4px 20px rgba(0,0,0,.08);
-  }
-  .mob-nav-btn{
-    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-    padding:6px 4px 4px;border:none;background:transparent;cursor:pointer;
-    color:var(--text-muted);font-family:'Plus Jakarta Sans',sans-serif;
-    font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
-    transition:color .25s;position:relative;
-  }
+  .mobile-bottom-nav{display:flex!important;position:fixed;bottom:0;left:0;right:0;height:calc(var(--mobile-nav-h) + var(--safe-bottom));background:var(--surface);border-top:1px solid var(--border);z-index:200;align-items:flex-start;padding-top:6px;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+  .mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 4px;border:none;background:transparent;cursor:pointer;color:var(--text-muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;transition:color .25s;position:relative}
   .mob-nav-btn.active{color:var(--accent)}
   .mob-nav-btn svg{width:22px;height:22px;stroke:currentColor;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
   .mob-nav-btn.active svg{transform:translateY(-2px)}
@@ -258,27 +301,15 @@ textarea{border-radius:20px!important}
   .mob-nav-btn.active::before{transform:translateX(-50%) scaleX(1)}
   .mob-nav-badge{position:absolute;top:2px;right:calc(50% - 20px);background:var(--danger);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;border:2px solid var(--surface);transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
   .mob-nav-badge.visible{transform:scale(1)}
-
-  /* MOBILE HERO */
   .dashboard-hero{border-radius:18px;padding:18px;margin:0 0 14px}
-  .hero-left h1{font-size:1.15rem}
-  .hero-left p{font-size:.76rem}
-  .hero-emoji{font-size:2.4rem}
-
-  /* hero stat pills */
+  .hero-left h1{font-size:1.15rem}.hero-left p{font-size:.76rem}.hero-emoji{font-size:2.4rem}
   .hero-stats-row{display:flex!important;gap:8px;margin-top:14px;position:relative;z-index:2}
   .hero-stat-pill{flex:1;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:9px 6px;text-align:center}
   .hero-stat-pill .val{font-size:17px;font-weight:800;color:#fff}
   .hero-stat-pill .lbl{font-size:9px;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:2px}
-
-  /* mobile page padding */
   .mob-pg{padding:0 14px}
-
-  /* MOBILE SECTION LABEL */
   .mob-section-lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px;margin:18px 0 10px}
   .mob-count-chip{background:var(--accent);color:white;font-size:9.5px;padding:2px 7px;border-radius:999px;font-weight:700}
-
-  /* MOBILE ORDER CARDS */
   .mob-order-list{display:flex;flex-direction:column;gap:10px}
   .mob-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;animation:mobCardIn .35s cubic-bezier(.34,1.2,.64,1) both;transition:transform .18s,box-shadow .18s}
   .mob-card:active{transform:scale(.985);box-shadow:none}
@@ -293,77 +324,67 @@ textarea{border-radius:20px!important}
   .mob-addr-row.locked{background:#fef9c3;border:1px solid rgba(252,211,77,.6)}
   .mob-addr-row svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
   .mob-addr-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-  .mob-addr-row.pickup .mob-addr-lbl{color:var(--green)}
-  .mob-addr-row.delivery .mob-addr-lbl{color:var(--accent-dark)}
-  .mob-addr-row.locked .mob-addr-lbl{color:#92400e}
+  .mob-addr-row.pickup .mob-addr-lbl{color:var(--green)}.mob-addr-row.delivery .mob-addr-lbl{color:var(--accent-dark)}.mob-addr-row.locked .mob-addr-lbl{color:#92400e}
   .mob-addr-val{font-size:12px;font-weight:600;line-height:1.4}
-  .mob-addr-row.pickup .mob-addr-val{color:#065F46}
-  .mob-addr-row.delivery .mob-addr-val{color:#7C2D12}
-  .mob-addr-row.locked .mob-addr-val{color:#92400e;font-size:11.5px}
+  .mob-addr-row.pickup .mob-addr-val{color:#065F46}.mob-addr-row.delivery .mob-addr-val{color:#7C2D12}.mob-addr-row.locked .mob-addr-val{color:#92400e;font-size:11.5px}
   .mob-card-foot{padding:8px 14px 13px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
   .mob-meta-row{display:flex;gap:6px;flex:1;flex-wrap:wrap;align-items:center}
   .mob-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:600;color:var(--dim)}
   .mob-chip svg{width:10px;height:10px}
   .mob-btn-row{display:flex;gap:7px;flex-shrink:0}
   .mob-btn{display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border-radius:999px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:transform .2s;white-space:nowrap}
-  .mob-btn:active{transform:scale(.91)}
-  .mob-btn svg{width:13px;height:13px}
+  .mob-btn:active{transform:scale(.91)}.mob-btn svg{width:13px;height:13px}
   .mob-btn-accept{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(26,122,74,.3)}
   .mob-btn-reveal{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(255,117,31,.3)}
   .mob-btn-done{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(255,117,31,.3)}
   .mob-btn-outline{background:var(--surface2);color:var(--text);border:1px solid var(--border-strong)}
   .mob-btn-del{background:#fff1f0;color:var(--danger)}
+  .mob-btn-proof{background:linear-gradient(135deg,#1a56a0,#1a3a7a);color:#fff;box-shadow:0 3px 10px rgba(26,86,160,.3)}
   .mob-status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
   .mob-status-pill.assigned{background:#fef9c3;color:#a16207}
   .mob-status-pill.out_for_delivery{background:var(--accent-light);color:var(--accent-dark)}
-
-  /* hide desktop lists in mobile, show mob lists */
-  .desk-only{display:none!important}
-  .mob-only{display:block!important}
-
-  /* desktop stats => 2-col on mobile */
+  .desk-only{display:none!important}.mob-only{display:block!important}
   .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-  .stat-card{padding:14px;border-radius:14px}
-  .stat-card p{font-size:1.5rem}
-  .stat-card h3{font-size:.62rem}
-  .stat-icon{width:30px;height:30px;border-radius:8px;right:10px;top:10px}
-  .stat-icon i{width:14px;height:14px}
-
-  /* profile mobile */
-  .profile-container{max-width:100%}
-  .profile-hero-card{padding:22px;border-radius:18px;margin-bottom:16px}
-  .profile-avatar-large{width:56px;height:56px;font-size:1.4rem}
-  .profile-hero-info h2{font-size:1.1rem}
-  .profile-field-row{flex-direction:column;align-items:flex-start;gap:8px}
-  .profile-pill-input{max-width:100%;width:100%}
+  .stat-card{padding:14px;border-radius:14px}.stat-card p{font-size:1.5rem}.stat-card h3{font-size:.62rem}
+  .stat-icon{width:30px;height:30px;border-radius:8px;right:10px;top:10px}.stat-icon i{width:14px;height:14px}
+  .profile-container{max-width:100%}.profile-hero-card{padding:22px;border-radius:18px;margin-bottom:16px}
+  .profile-avatar-large{width:56px;height:56px;font-size:1.4rem}.profile-hero-info h2{font-size:1.1rem}
+  .profile-field-row{flex-direction:column;align-items:flex-start;gap:8px}.profile-pill-input{max-width:100%;width:100%}
   .settings-container{max-width:100%}
-
-  /* history mobile */
   .history-card{border-radius:14px;padding:13px 14px}
-
-  /* MOBILE MODAL = BOTTOM SHEET */
   .modal-overlay{align-items:flex-end!important}
   .modal-content{width:100%!important;max-width:100%!important;border-radius:24px 24px 0 0!important;padding:18px 18px calc(var(--safe-bottom) + 20px)!important;transform:translateY(100%)!important;max-height:92vh!important;transition:transform .4s cubic-bezier(.34,1.2,.64,1)!important}
   .modal-overlay.active .modal-content{transform:translateY(0)!important}
   .modal-handle{display:block!important}
   .modal-btn-row{flex-direction:column!important}
   .modal-btn-row .btn{justify-content:center!important;padding:13px!important;font-size:.88rem!important;border-radius:14px!important}
-
-  /* toast above mobile nav */
   .toast{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 10px);right:12px;left:12px;max-width:100%;border-radius:14px}
-
-  /* page title */
   .page-content>h1{font-size:1.4rem!important;margin-bottom:18px!important;padding:0 14px}
-
-  /* map height */
   .map-container{height:200px}
+  .leaderboard-container{max-width:100%}
+  .busy-reason-grid{grid-template-columns:1fr 1fr}
+  .route-card{border-radius:16px;padding:16px}
 }
-
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 .spin{animation:spin 1s linear infinite}
 </style>
 </head>
 <body>
+
+<!-- OFFLINE BANNER -->
+<div id="offlineBanner">
+  <div class="offline-dot"></div>
+  <span>You're offline — orders will sync when back online</span>
+</div>
+
+<!-- BUSY MODE BANNER -->
+<div id="busyBanner">
+  <div class="busy-banner-left">
+    <span style="font-size:1.1rem">⏸</span>
+    <span>Busy mode: <strong id="busyReasonLabel">On break</strong> — not receiving new orders</span>
+  </div>
+  <button class="busy-go-online-btn" onclick="goOnlineFromBanner()">Go Online</button>
+</div>
 
 <!-- SHIMMER -->
 <div id="shimmerOverlay">
@@ -398,6 +419,7 @@ textarea{border-radius:20px!important}
       <div class="nav-item" onclick="showTab('deliveries',this)"><i data-lucide="map-pin" class="nav-icon"></i><span class="nav-text">My Deliveries</span></div>
       <div class="nav-item" onclick="showTab('history',this)"><i data-lucide="clock" class="nav-icon"></i><span class="nav-text">Order History</span></div>
       <div class="nav-item" onclick="showTab('earnings',this)"><i data-lucide="dollar-sign" class="nav-icon"></i><span class="nav-text">Earnings</span></div>
+      <div class="nav-item" onclick="showTab('leaderboard',this)"><i data-lucide="trophy" class="nav-icon"></i><span class="nav-text">Leaderboard</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Account</div>
@@ -410,7 +432,7 @@ textarea{border-radius:20px!important}
     <div class="user-avatar" id="driverAvatar">D</div>
     <div class="user-info">
       <div style="font-weight:700" id="driverSidebarName">Driver</div>
-      <div style="font-size:.72rem;color:var(--accent)"><span class="online-dot"></span>Online</div>
+      <div style="font-size:.72rem;color:var(--accent)" id="sidebarStatusLine"><span class="online-dot"></span>Online</div>
     </div>
   </div>
 </nav>
@@ -421,6 +443,20 @@ textarea{border-radius:20px!important}
   <!-- DASHBOARD -->
   <section id="dashboard" class="page-content active">
     <div id="locationBanner" class="location-banner" style="display:none"></div>
+    <!-- Route optimization card (shown when 2+ active) -->
+    <div id="routeOptCard" style="display:none" class="mob-pg desk-padding">
+      <div class="route-card">
+        <div class="route-card-title">🗺 Route Optimisation</div>
+        <h3>Combined delivery route</h3>
+        <div class="route-stops" id="routeStopList"></div>
+        <div class="route-map-wrap"><div id="routeOptMap"></div></div>
+        <div style="margin-top:12px">
+          <button onclick="openGoogleMapsRoute()" class="btn-primary" style="width:100%;justify-content:center">
+            <i data-lucide="navigation" style="width:15px;height:15px"></i> Open Full Route in Google Maps
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="dashboard-hero">
       <div class="hero-inner">
         <div class="hero-left"><h1 id="dashHeroTitle">Ready to Ride? 🛵</h1><p id="dashHeroSub">Available deliveries near you</p></div>
@@ -433,16 +469,13 @@ textarea{border-radius:20px!important}
         <div class="hero-stat-pill"><div class="val" id="hStatActive">0</div><div class="lbl">Active</div></div>
       </div>
     </div>
-    <!-- desktop stat cards -->
     <div class="stats-grid" id="driverStatsGrid"></div>
-    <!-- mobile section -->
     <div class="mob-only mob-pg">
       <div class="mob-section-lbl">Available Orders <span class="mob-count-chip" id="mobAvailChip">0</span></div>
       <div class="mob-order-list" id="mobAvailList"></div>
       <div class="mob-section-lbl" style="margin-top:20px">My Active Deliveries</div>
       <div class="mob-order-list" id="mobActiveList"></div>
     </div>
-    <!-- desktop two-col -->
     <div class="dash-two-col desk-only">
       <div class="content-card">
         <div class="card-header"><h2><i data-lucide="shopping-bag" style="width:18px;height:18px;color:var(--accent)"></i> Available Orders <span id="availableCount" style="background:var(--accent);color:white;border-radius:999px;padding:2px 8px;font-size:.72rem;margin-left:4px">0</span></h2></div>
@@ -460,14 +493,14 @@ textarea{border-radius:20px!important}
     <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">Available Orders</h1>
     <div id="locationBanner2" class="location-banner" style="display:none;margin-bottom:16px"></div>
     <div class="mob-only mob-pg"><div class="mob-order-list" id="mobAvailFull"></div></div>
-    <div class="desk-only" id="availableFullList" style="padding:0" class="content-card"></div>
+    <div class="desk-only content-card" id="availableFullList" style="padding:0"></div>
   </section>
 
   <!-- DELIVERIES -->
   <section id="deliveries" class="page-content">
     <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">My Current Deliveries</h1>
     <div class="mob-only mob-pg"><div class="mob-order-list" id="mobDelivFull"></div></div>
-    <div class="desk-only" id="myDeliveriesFullList" class="content-card" style="padding:0"></div>
+    <div class="desk-only content-card" id="myDeliveriesFullList" style="padding:0"></div>
   </section>
 
   <!-- HISTORY -->
@@ -487,6 +520,20 @@ textarea{border-radius:20px!important}
     </div>
   </section>
 
+  <!-- LEADERBOARD -->
+  <section id="leaderboard" class="page-content">
+    <div class="leaderboard-container mob-pg" style="max-width:700px">
+      <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:20px;padding:0">Leaderboard</h1>
+      <div class="leaderboard-header-card">
+        <div style="font-size:2rem;margin-bottom:8px;position:relative">🏆</div>
+        <h2>Top Drivers</h2>
+        <p>Best performing drivers by province this month</p>
+      </div>
+      <div class="leaderboard-province-filter" id="provinceFilter"></div>
+      <div id="leaderboardList"></div>
+    </div>
+  </section>
+
   <!-- PROFILE -->
   <section id="profile" class="page-content">
     <div class="profile-container mob-pg" style="max-width:700px">
@@ -497,7 +544,7 @@ textarea{border-radius:20px!important}
           <div class="profile-hero-info">
             <h2 id="profileName">Driver Name</h2>
             <p id="profileID">DRV-XXXXXX</p>
-            <div class="profile-status-pill"><span class="online-dot"></span> Active Driver</div>
+            <div class="profile-status-pill" id="profileStatusPill"><span class="online-dot"></span> Active Driver</div>
           </div>
         </div>
       </div>
@@ -531,7 +578,17 @@ textarea{border-radius:20px!important}
       <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px;padding:0">Settings</h1>
       <div class="settings-card">
         <div class="settings-card-title">Availability</div>
-        <div class="settings-row"><div><div class="settings-label">Online Status</div><div class="settings-sub">Show as available to receive orders</div></div><div class="toggle on" id="tog-online" onclick="toggleSetting(this,'online')"></div></div>
+        <div class="settings-row">
+          <div><div class="settings-label">Online Status</div><div class="settings-sub">Show as available to receive orders</div></div>
+          <div class="toggle on" id="tog-online" onclick="toggleSetting(this,'online')"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" style="display:flex;align-items:center;gap:8px">Busy Mode <span id="busyModeLabel" style="font-size:.7rem;color:var(--text-muted);font-weight:600"></span></div><div class="settings-sub">Pause orders — traffic, lunch, fuel, load-shedding</div></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button onclick="openModal('busyModeModal')" class="btn btn-warning" style="font-size:.75rem;padding:6px 14px"><i data-lucide="pause-circle" style="width:13px;height:13px"></i> <span id="busyBtnLabel">Set Busy</span></button>
+            <div class="toggle busy-color" id="tog-busy" onclick="toggleBusyMode(this)"></div>
+          </div>
+        </div>
         <div class="settings-row"><div><div class="settings-label">Auto-Accept Nearby Orders</div><div class="settings-sub">Automatically accept orders within 2km</div></div><div class="toggle" id="tog-autoaccept" onclick="toggleSetting(this,'autoaccept')"></div></div>
         <div class="settings-row"><div><div class="settings-label">Availability Schedule</div><div class="settings-sub">Use preset working hours</div></div><div class="toggle on" id="tog-schedule" onclick="toggleSetting(this,'schedule')"></div></div>
       </div>
@@ -571,6 +628,9 @@ textarea{border-radius:20px!important}
   <button class="mob-nav-btn" id="mnh" onclick="mobileTab('history','mnh')">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>History
   </button>
+  <button class="mob-nav-btn" id="mnl" onclick="mobileTab('leaderboard','mnl')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>Board
+  </button>
   <button class="mob-nav-btn" id="mnp" onclick="mobileTab('profile','mnp')">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
   </button>
@@ -602,6 +662,75 @@ textarea{border-radius:20px!important}
   </div>
 </div>
 
+<!-- PROOF OF DELIVERY MODAL -->
+<div class="modal-overlay" id="proofModal">
+  <div class="modal-content" style="max-width:500px">
+    <div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <h3 style="font-size:1.1rem;font-weight:800">📸 Photo Proof of Delivery</h3>
+      <button onclick="hideModal('proofModal')" style="background:var(--surface2);border:none;border-radius:999px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <p style="font-size:.82rem;color:var(--dim);margin-bottom:16px">Take or upload a photo showing the delivered order at the customer's door.</p>
+    <div class="proof-upload-area" id="proofUploadArea">
+      <input type="file" id="proofFileInput" accept="image/*" capture="environment" onchange="handleProofPhoto(this)">
+      <img id="proofPreviewImg" class="proof-preview" src="" alt="Proof preview">
+      <div id="proofUploadPrompt">
+        <div class="proof-upload-icon">📷</div>
+        <div class="proof-upload-label">Tap to take a photo or upload</div>
+        <div class="proof-upload-sub">JPEG, PNG — max 10MB</div>
+      </div>
+    </div>
+    <div class="proof-uploading" id="proofUploading">
+      <div style="width:20px;height:20px;border:3px solid var(--accent-muted);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+      Uploading photo to Cloudinary…
+    </div>
+    <div id="proofSuccessBlock" style="display:none;background:#edf9f2;border:1px solid #bbf0d3;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:.84rem;font-weight:600;color:var(--green)">
+      ✓ Photo uploaded — ready to confirm delivery
+    </div>
+    <div class="modal-btn-row">
+      <button class="btn btn-success" style="flex:2;justify-content:center;padding:14px;border-radius:999px" id="confirmDeliveredBtn" onclick="submitProofAndDeliver()" disabled>
+        <i data-lucide="check-circle" style="width:15px;height:15px"></i> Confirm Delivered
+      </button>
+      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('proofModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUSY MODE MODAL -->
+<div class="modal-overlay" id="busyModeModal">
+  <div class="modal-content" style="max-width:440px">
+    <div class="modal-handle"></div>
+    <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:4px">⏸ Set Busy Mode</h3>
+    <p style="font-size:.82rem;color:var(--dim);margin-bottom:6px">Choose a reason — you won't receive new orders while busy.</p>
+    <div class="busy-reason-grid" id="busyReasonGrid">
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🚦','Traffic')" data-reason="Traffic">
+        <div class="reason-icon">🚦</div><div class="reason-label">Traffic</div>
+      </div>
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🍽','Lunch break')" data-reason="Lunch break">
+        <div class="reason-icon">🍽</div><div class="reason-label">Lunch Break</div>
+      </div>
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'⚡','Load-shedding')" data-reason="Load-shedding">
+        <div class="reason-icon">⚡</div><div class="reason-label">Load-shedding</div>
+      </div>
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'⛽','Fuel')" data-reason="Fuel">
+        <div class="reason-icon">⛽</div><div class="reason-label">Low on Fuel</div>
+      </div>
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🔧','Maintenance')" data-reason="Maintenance">
+        <div class="reason-icon">🔧</div><div class="reason-label">Vehicle Issue</div>
+      </div>
+      <div class="busy-reason-btn" onclick="selectBusyReason(this,'😴','Personal')" data-reason="Personal">
+        <div class="reason-icon">😴</div><div class="reason-label">Personal</div>
+      </div>
+    </div>
+    <div class="modal-btn-row">
+      <button class="btn btn-warning" style="flex:1;justify-content:center;padding:14px;border-radius:999px" id="confirmBusyBtn" onclick="confirmBusyMode()" disabled>
+        <i data-lucide="pause-circle" style="width:15px;height:15px"></i> Go Busy
+      </button>
+      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('busyModeModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- DELETE MODAL -->
 <div class="modal-overlay" id="deleteConfirmModal">
   <div class="modal-content" style="max-width:400px;text-align:center">
@@ -619,16 +748,33 @@ textarea{border-radius:20px!important}
 <div class="toast" id="toast"><i data-lucide="check-circle" style="width:18px;height:18px"></i><span id="toastMsg">Done</span></div>
 
 <script>
+/* ─── CONFIG ─────────────────────────────── */
 const firebaseConfig={apiKey:"AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",authDomain:"test-17881.firebaseapp.com",projectId:"test-17881",storageBucket:"test-17881.firebasestorage.app",messagingSenderId:"1057428047643",appId:"1:1057428047643:web:f3801c0d933225a5cd35be",databaseURL:"https://test-17881-default-rtdb.firebaseio.com/"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 const MAPBOX_TOKEN='pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
 mapboxgl.accessToken=MAPBOX_TOKEN;
+const CLOUDINARY_CLOUD='your_cloud_name';      // ← Replace
+const CLOUDINARY_PRESET='your_upload_preset';  // ← Replace (unsigned)
 
-let DRIVER_KEY=null,driverData=null,ordersCache={},pendingDeleteKey=null,currentMapInstance=null;
+/* ─── STATE ──────────────────────────────── */
+let DRIVER_KEY=null,driverData=null,ordersCache={},pendingDeleteKey=null;
+let currentMapInstance=null,routeMapInstance=null;
 let driverLat=null,driverLng=null,locationError=null,locationWatcher=null,locBannerShown=false;
-let vendorCache={};
+let vendorCache={},gcCache={};
+let isOnline=navigator.onLine;
+let isBusy=false,busyReason='',selectedBusyEmoji='',selectedBusyReason='';
+let proofOrderKey=null,proofUploadedUrl=null;
+let selectedProvince='';
 
+/* ─── OFFLINE CACHE ──────────────────────── */
+const CACHE_KEY='1busket_orders_cache';
+const CACHE_DRIVER_KEY='1busket_driver_cache';
+function saveOrdersToCache(orders){try{const arr=Object.entries(orders).slice(-20).reduce((a,[k,v])=>{a[k]=v;return a;},{});localStorage.setItem(CACHE_KEY,JSON.stringify(arr));localStorage.setItem(CACHE_DRIVER_KEY,JSON.stringify(driverData));}catch(e){}}
+function loadOrdersFromCache(){try{const raw=localStorage.getItem(CACHE_KEY);return raw?JSON.parse(raw):{};}catch(e){return{};}}
+function loadDriverFromCache(){try{const raw=localStorage.getItem(CACHE_DRIVER_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
+
+/* ─── SESSION GUARD ──────────────────────── */
 (function(){
   const s=JSON.parse(localStorage.getItem('1busket_driver_session')||'null');
   if(!s||!s.key||(Date.now()-s.loggedAt)>=86400000){window.location.href='login.html';return;}
@@ -637,25 +783,102 @@ let vendorCache={};
 
 const isMob=()=>window.innerWidth<=768;
 
-function getDriverFullName(d){if(!d)return'Driver';if(d.name&&d.name.trim())return d.name.trim();const f=d.firstName?d.firstName.trim():'',l=d.lastName?d.lastName.trim():'';if(f||l)return`${f} ${l}`.trim();return'Driver';}
-function getCustomerName(o){if(o.customerName&&o.customerName.trim())return o.customerName.trim();if(o.userName&&o.userName.trim())return o.userName.trim();if(o.customer&&typeof o.customer==='string'&&o.customer.trim())return o.customer.trim();if(o.userEmail&&o.userEmail.includes('@'))return o.userEmail.split('@')[0];return'Customer';}
-function getRestaurantAddrSync(o){let a=o.vendorAddress||o.restaurantAddress||o.vendorLocation||(o.vendor&&(o.vendor.address||o.vendor.location||o.vendor.fullAddress))||o.pickupAddress||o.pickupLocation||o.storeAddress||o.shopAddress;if(a&&a.trim())return a.trim();if(o.vendorKey&&vendorCache[o.vendorKey])return vendorCache[o.vendorKey];return null;}
-function getCustomerAddr(o){if(o.deliveryAddress&&o.deliveryAddress.trim())return o.deliveryAddress.trim();if(o.address&&o.address.trim())return o.address.trim();if(o.customerAddress&&o.customerAddress.trim())return o.customerAddress.trim();if(o.shippingAddress&&o.shippingAddress.trim())return o.shippingAddress.trim();if(o.fullAddress&&o.fullAddress.trim())return o.fullAddress.trim();if(o.dropoffAddress&&o.dropoffAddress.trim())return o.dropoffAddress.trim();if(o.destination&&o.destination.trim())return o.destination.trim();if(o.location){const l=o.location;if(typeof l==='string'&&l.trim())return l.trim();if(l.address&&l.address.trim())return l.address.trim();}if(o.customer&&typeof o.customer==='object'&&o.customer.address)return o.customer.address.trim();return null;}
-async function getVendorAddr(vk){if(!vk)return null;if(vendorCache[vk])return vendorCache[vk];try{const snap=await db.ref('vendors/'+vk).once('value');const v=snap.val();if(v&&v.address){const p=[v.address.street,v.address.suburb,v.address.city,v.address.province].filter(Boolean);const a=p.join(', ')||(v.address.fullAddress||null);vendorCache[vk]=a;return a;}else if(v&&v.location&&typeof v.location==='string'){vendorCache[vk]=v.location;return v.location;}}catch(e){}vendorCache[vk]=null;return null;}
+/* ─── ONLINE/OFFLINE ─────────────────────── */
+window.addEventListener('online',()=>{isOnline=true;document.getElementById('offlineBanner').classList.remove('show');showToast('Back online — syncing orders…','success');startDriverSync();});
+window.addEventListener('offline',()=>{isOnline=false;document.getElementById('offlineBanner').classList.add('show');ordersCache=loadOrdersFromCache();if(!driverData)driverData=loadDriverFromCache();if(driverData)applyDriverUI();renderDashboard();showToast('Offline — showing cached orders','error');});
 
+function updateBannerOffsets(){
+  const ob=document.getElementById('offlineBanner');
+  const bb=document.getElementById('busyBanner');
+  if(isOnline&&isBusy){bb.classList.remove('offline-offset');bb.style.top='0';}
+  else if(!isOnline&&isBusy){bb.classList.add('offline-offset');}
+}
+
+/* ─── BUSY MODE ──────────────────────────── */
+function selectBusyReason(el,emoji,reason){
+  document.querySelectorAll('.busy-reason-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBusyEmoji=emoji;
+  selectedBusyReason=reason;
+  document.getElementById('confirmBusyBtn').disabled=false;
+}
+
+function confirmBusyMode(){
+  if(!selectedBusyReason)return;
+  isBusy=true;
+  busyReason=selectedBusyReason;
+  document.getElementById('busyReasonLabel').textContent=selectedBusyEmoji+' '+busyReason;
+  document.getElementById('busyBanner').classList.add('show');
+  document.getElementById('tog-busy').classList.add('on');
+  document.getElementById('busyBtnLabel').textContent='End Busy';
+  document.getElementById('busyModeLabel').textContent='• '+busyReason;
+  updateBannerOffsets();
+  if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({isBusy:true,busyReason,busyAt:Date.now()});
+  hideModal('busyModeModal');
+  showToast('Busy mode: '+busyReason+' — orders paused','success');
+  updateSidebarStatus();
+}
+
+function toggleBusyMode(el){
+  if(isBusy){goOnlineFromBanner();}
+  else{openModal('busyModeModal');}
+}
+
+function goOnlineFromBanner(){
+  isBusy=false;busyReason='';
+  document.getElementById('busyBanner').classList.remove('show');
+  document.getElementById('tog-busy').classList.remove('on');
+  document.getElementById('busyBtnLabel').textContent='Set Busy';
+  document.getElementById('busyModeLabel').textContent='';
+  if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({isBusy:false,busyReason:null});
+  document.querySelectorAll('.busy-reason-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('confirmBusyBtn').disabled=true;
+  selectedBusyReason='';selectedBusyEmoji='';
+  updateBannerOffsets();
+  showToast('You\'re back online! 🛵','success');
+  updateSidebarStatus();
+}
+
+function updateSidebarStatus(){
+  const line=document.getElementById('sidebarStatusLine');
+  if(!line)return;
+  if(isBusy)line.innerHTML=`<span class="busy-dot"></span><span style="color:#ff9500">Busy: ${busyReason}</span>`;
+  else line.innerHTML=`<span class="online-dot"></span>Online`;
+  const pill=document.getElementById('profileStatusPill');
+  if(pill){
+    if(isBusy)pill.innerHTML=`<span class="busy-dot"></span> Busy — ${busyReason}`;
+    else pill.innerHTML=`<span class="online-dot"></span> Active Driver`;
+  }
+}
+
+/* ─── HELPERS ────────────────────────────── */
+function getDriverFullName(d){if(!d)return'Driver';if(d.name&&d.name.trim())return d.name.trim();const f=d.firstName?d.firstName.trim():'',l=d.lastName?d.lastName.trim():'';return(f+' '+l).trim()||'Driver';}
+function getCustomerName(o){return o.customerName||o.userName||(typeof o.customer==='string'?o.customer:null)||(o.userEmail?o.userEmail.split('@')[0]:null)||'Customer';}
+function getRestaurantAddrSync(o){let a=o.vendorAddress||o.restaurantAddress||o.vendorLocation||(o.vendor&&(o.vendor.address||o.vendor.location))||o.pickupAddress||o.storeAddress;if(a&&a.trim())return a.trim();if(o.vendorKey&&vendorCache[o.vendorKey])return vendorCache[o.vendorKey];return null;}
+function getCustomerAddr(o){return o.deliveryAddress||o.address||o.customerAddress||o.shippingAddress||o.fullAddress||o.dropoffAddress||o.destination||(o.location&&(typeof o.location==='string'?o.location:o.location.address))||(o.customer&&typeof o.customer==='object'?o.customer.address:null)||null;}
+async function getVendorAddr(vk){if(!vk||vendorCache[vk]!==undefined)return vendorCache[vk]||null;try{const snap=await db.ref('vendors/'+vk).once('value');const v=snap.val();if(v&&v.address){const a=[v.address.street,v.address.suburb,v.address.city,v.address.province].filter(Boolean).join(', ')||v.address.fullAddress||null;vendorCache[vk]=a;return a;}if(v&&v.location&&typeof v.location==='string'){vendorCache[vk]=v.location;return v.location;}}catch(e){}vendorCache[vk]=null;return null;}
+
+/* ─── GEOCODE ────────────────────────────── */
+async function geocode(addr){
+  if(!addr)return null;
+  if(gcCache[addr])return gcCache[addr];
+  try{const r=await fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(addr)}&access_token=${MAPBOX_TOKEN}&limit=1&country=ZA`);const d=await r.json();if(d.features&&d.features.length>0){const[lng,lat]=d.features[0].geometry.coordinates;gcCache[addr]={lat,lng};return{lat,lng};}}catch(e){}return null;
+}
+
+/* ─── LOCATION ───────────────────────────── */
 function startLocationWatch(){
   if(!navigator.geolocation){locationError='Geolocation not supported';updateLocBanners('error');renderDashboard();return;}
   updateLocBanners('fetching');
   navigator.geolocation.getCurrentPosition(pos=>{
     driverLat=pos.coords.latitude;driverLng=pos.coords.longitude;locationError=null;
     updateLocBanners('success');
-    if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
+    if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
     renderDashboard();
   },err=>{locationError=err.code===1?'Location denied. Showing all orders.':'Could not get location.';updateLocBanners('error');renderDashboard();},{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
   if(locationWatcher)navigator.geolocation.clearWatch(locationWatcher);
   locationWatcher=navigator.geolocation.watchPosition(pos=>{
     driverLat=pos.coords.latitude;driverLng=pos.coords.longitude;
-    if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
+    if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
     updateLocBanners('success');
   },()=>{},{enableHighAccuracy:true,maximumAge:60000});
 }
@@ -668,10 +891,10 @@ function updateLocBanners(state){
     const html=`<i data-lucide="loader" style="width:18px;height:18px;animation:spin 1s linear infinite"></i> Getting your location…`;
     [b1,b2].forEach(b=>{if(!b)return;b.className='location-banner';b.style.display='flex';b.innerHTML=html;});
     if(ms)ms.innerHTML=`<i data-lucide="map-pin" style="width:12px;height:12px"></i> Locating…`;
-  } else if(state==='success'){
+  }else if(state==='success'){
     if(!locBannerShown){[b1,b2].forEach(b=>{if(!b)return;b.className='location-banner success';b.style.display='flex';b.innerHTML=`<i data-lucide="check-circle" style="width:18px;height:18px"></i> Showing all available orders`;});setTimeout(()=>{[b1,b2].forEach(b=>{if(b)b.style.display='none';});},4000);locBannerShown=true;}
     if(ms)ms.innerHTML=`<i data-lucide="map-pin" style="width:12px;height:12px"></i> Located`;
-  } else if(state==='error'){
+  }else if(state==='error'){
     const html=`<i data-lucide="alert-circle" style="width:18px;height:18px"></i> ${locationError}`;
     [b1,b2].forEach(b=>{if(!b)return;b.className='location-banner error';b.style.display='flex';b.innerHTML=html;});
     if(ms)ms.innerHTML=`<i data-lucide="alert-circle" style="width:12px;height:12px"></i> No location`;
@@ -679,8 +902,13 @@ function updateLocBanners(state){
   lucide.createIcons();
 }
 
+/* ─── INIT ───────────────────────────────── */
 function initPortal(){
-  showShimmer();startDriverSync();startLocationWatch();
+  showShimmer();
+  if(!isOnline){ordersCache=loadOrdersFromCache();driverData=loadDriverFromCache();if(driverData)applyDriverUI();renderDashboard();hideShimmer();document.getElementById('offlineBanner').classList.add('show');}
+  else{startDriverSync();}
+  startLocationWatch();
+  buildLeaderboardProvinces();
   setTimeout(()=>{
     const mob=isMob();
     document.getElementById('driverSidebar').style.display=mob?'none':'flex';
@@ -693,9 +921,20 @@ function showShimmer(){document.getElementById('shimmerOverlay').classList.add('
 function hideShimmer(){const s=document.getElementById('shimmerOverlay');s.classList.add('fade-out');setTimeout(()=>s.classList.remove('active','fade-out'),600);}
 
 function startDriverSync(){
-  if(!DRIVER_KEY)return;
-  db.ref('drivers/'+DRIVER_KEY).on('value',snap=>{driverData=snap.val();if(driverData)applyDriverUI();});
-  db.ref('orders').on('value',snap=>{ordersCache=snap.val()||{};renderDashboard();updateHistoryTab();updateEarningsTab();});
+  if(!DRIVER_KEY||!isOnline)return;
+  db.ref('drivers/'+DRIVER_KEY).on('value',snap=>{
+    driverData=snap.val();
+    if(driverData){
+      applyDriverUI();
+      // Restore busy state
+      if(driverData.isBusy&&!isBusy){isBusy=true;busyReason=driverData.busyReason||'On break';selectedBusyEmoji='⏸';document.getElementById('busyReasonLabel').textContent=busyReason;document.getElementById('busyBanner').classList.add('show');document.getElementById('tog-busy').classList.add('on');document.getElementById('busyBtnLabel').textContent='End Busy';document.getElementById('busyModeLabel').textContent='• '+busyReason;updateSidebarStatus();}
+    }
+  });
+  db.ref('orders').on('value',snap=>{
+    ordersCache=snap.val()||{};
+    saveOrdersToCache(ordersCache);
+    renderDashboard();updateHistoryTab();updateEarningsTab();renderLeaderboard();
+  });
 }
 
 function applyDriverUI(){
@@ -717,24 +956,28 @@ function applyDriverUI(){
   if(driverData.rating){const el=document.getElementById('p-rating');if(el)el.value=driverData.rating+' ★';const hr=document.getElementById('hStatRating');if(hr)hr.textContent=driverData.rating+'★';}
   if(driverData.settings){['online','autoaccept','schedule','alerts','push','location','dark'].forEach(k=>{const tog=document.getElementById('tog-'+k);if(tog){if(driverData.settings[k])tog.classList.add('on');else tog.classList.remove('on');}});}
   if(driverLat===null&&driverData.lastLat){driverLat=driverData.lastLat;driverLng=driverData.lastLng;}
+  updateSidebarStatus();
 }
 
+/* ─── DASHBOARD RENDER ───────────────────── */
 let dashDebounce=null;
 function renderDashboard(){clearTimeout(dashDebounce);dashDebounce=setTimeout(_renderDashboard,120);}
+
 async function _renderDashboard(){
   const entries=Object.entries(ordersCache);
-  const ready=entries.filter(([k,o])=>o.status==='ready'&&!o.driverKey);
+  // If busy, hide available orders from driver
+  const ready=isBusy?[]:entries.filter(([k,o])=>o.status==='ready'&&!o.driverKey);
   const myActive=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&(o.status==='assigned'||o.status==='out_for_delivery'));
-  for(const [key,o] of ready){if(!getRestaurantAddrSync(o)&&o.vendorKey&&!vendorCache[o.vendorKey])await getVendorAddr(o.vendorKey);}
+  for(const[key,o]of ready){if(!getRestaurantAddrSync(o)&&o.vendorKey&&!vendorCache[o.vendorKey])await getVendorAddr(o.vendorKey);}
   const count=ready.length;
 
   // badges
-  const ab=document.getElementById('availableBadge');if(ab){if(count>0){ab.style.display='inline-block';ab.textContent=count;}else ab.style.display='none';}
-  const mnb=document.getElementById('mobNavBadge');if(mnb){if(count>0){mnb.textContent=count;mnb.classList.add('visible');}else mnb.classList.remove('visible');}
-  const ac=document.getElementById('availableCount');if(ac)ac.textContent=count;
-  const mc=document.getElementById('mobAvailChip');if(mc)mc.textContent=count;
+  const ab=document.getElementById('availableBadge');if(ab){if(count>0&&!isBusy){ab.style.display='inline-block';ab.textContent=count;}else ab.style.display='none';}
+  const mnb=document.getElementById('mobNavBadge');if(mnb){if(count>0&&!isBusy){mnb.textContent=count;mnb.classList.add('visible');}else mnb.classList.remove('visible');}
+  const ac=document.getElementById('availableCount');if(ac)ac.textContent=isBusy?'Paused':count;
+  const mc=document.getElementById('mobAvailChip');if(mc)mc.textContent=isBusy?'Paused':count;
 
-  // hero stat pills
+  // hero stats
   const today=new Date().toDateString();
   const todayDel=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&o.status==='delivered'&&new Date(o.createdAt).toDateString()===today);
   const todayEarn=todayDel.reduce((s,[k,o])=>s+Number(o.total||0)*0.15,0);
@@ -742,22 +985,24 @@ async function _renderDashboard(){
   const hse=document.getElementById('hStatEarn');if(hse)hse.textContent='R'+todayEarn.toFixed(0);
   const hsa=document.getElementById('hStatActive');if(hsa)hsa.textContent=myActive.length;
 
-  const noAvail=`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">🛵</div><div style="font-weight:700;margin-bottom:4px">No available orders</div><div style="font-size:.82rem">All ready orders will appear here</div></div>`;
+  // route optimization
+  renderRouteOptimisation(myActive);
+
+  const noAvail=isBusy
+    ?`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">⏸</div><div style="font-weight:700;margin-bottom:4px">Busy mode: ${busyReason}</div><div style="font-size:.82rem">You won't receive new orders. <a href="#" onclick="goOnlineFromBanner();return false;" style="color:var(--accent);font-weight:700">Go online</a></div></div>`
+    :`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">🛵</div><div style="font-weight:700;margin-bottom:4px">No available orders</div><div style="font-size:.82rem">All ready orders will appear here</div></div>`;
   const noActive=`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">📦</div><div style="font-weight:700;margin-bottom:4px">No active deliveries</div><div style="font-size:.82rem">Accept an order to get started</div></div>`;
 
-  // desktop
-  const aol=document.getElementById('availableOrdersList');if(aol)aol.innerHTML=ready.length===0?noAvail:ready.map(([k,o])=>buildDeskAvail(k,o)).join('');
-  const mdl=document.getElementById('myDeliveriesList');if(mdl)mdl.innerHTML=myActive.length===0?noActive:myActive.map(([k,o])=>buildDeskActive(k,o)).join('');
-  const afl=document.getElementById('availableFullList');if(afl)afl.innerHTML=ready.length===0?`<div style="padding:16px">${noAvail}</div>`:ready.map(([k,o])=>buildDeskAvail(k,o)).join('');
-  const mfl=document.getElementById('myDeliveriesFullList');if(mfl)mfl.innerHTML=myActive.length===0?`<div style="padding:16px">${noActive}</div>`:myActive.map(([k,o])=>buildDeskActive(k,o)).join('');
+  const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+  set('availableOrdersList',ready.length===0?noAvail:ready.map(([k,o])=>buildDeskAvail(k,o)).join(''));
+  set('myDeliveriesList',myActive.length===0?noActive:myActive.map(([k,o])=>buildDeskActive(k,o)).join(''));
+  set('availableFullList',ready.length===0?`<div style="padding:16px">${noAvail}</div>`:ready.map(([k,o])=>buildDeskAvail(k,o)).join(''));
+  set('myDeliveriesFullList',myActive.length===0?`<div style="padding:16px">${noActive}</div>`:myActive.map(([k,o])=>buildDeskActive(k,o)).join(''));
+  set('mobAvailList',ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join(''));
+  set('mobActiveList',myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join(''));
+  set('mobAvailFull',ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join(''));
+  set('mobDelivFull',myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join(''));
 
-  // mobile
-  const mal=document.getElementById('mobAvailList');if(mal)mal.innerHTML=ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join('');
-  const mac=document.getElementById('mobActiveList');if(mac)mac.innerHTML=myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join('');
-  const maf=document.getElementById('mobAvailFull');if(maf)maf.innerHTML=ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join('');
-  const mdf=document.getElementById('mobDelivFull');if(mdf)mdf.innerHTML=myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join('');
-
-  // desktop stats grid
   const totalDel=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&o.status==='delivered').length;
   const ptd=document.getElementById('p-total-deliveries');if(ptd)ptd.value=totalDel;
   const sg=document.getElementById('driverStatsGrid');if(sg)sg.innerHTML=`
@@ -768,7 +1013,79 @@ async function _renderDashboard(){
   lucide.createIcons();
 }
 
-// DESKTOP BUILDERS
+/* ─── ROUTE OPTIMISATION ─────────────────── */
+let routeOptOrders=[];
+async function renderRouteOptimisation(myActive){
+  const card=document.getElementById('routeOptCard');
+  if(myActive.length<2){if(card)card.style.display='none';if(routeMapInstance){routeMapInstance.remove();routeMapInstance=null;}return;}
+  if(card)card.style.display='block';
+  routeOptOrders=myActive;
+
+  // Build stops list
+  const stopListEl=document.getElementById('routeStopList');
+  if(!stopListEl)return;
+  let stopsHtml='';
+  let stopNum=1;
+  for(const[key,o]of myActive){
+    const ra=getRestaurantAddrSync(o)||'Restaurant';
+    stopsHtml+=`<div class="route-stop"><div class="route-stop-num pickup">${stopNum++}</div><div class="route-stop-info"><div class="route-stop-type" style="color:rgba(255,255,255,.5)">Pickup · ${o.vendorName||'Restaurant'}</div><div class="route-stop-addr">${ra}</div></div></div>`;
+    if(o.status==='out_for_delivery'){
+      const ca=getCustomerAddr(o)||'Customer';
+      stopsHtml+=`<div class="route-stop"><div class="route-stop-num delivery">${stopNum++}</div><div class="route-stop-info"><div class="route-stop-type" style="color:rgba(255,255,255,.5)">Delivery · ${getCustomerName(o)}</div><div class="route-stop-addr">${ca}</div></div></div>`;
+    }
+  }
+  stopListEl.innerHTML=stopsHtml;
+
+  // Build route on map
+  setTimeout(async()=>{
+    const mapEl=document.getElementById('routeOptMap');
+    if(!mapEl)return;
+    if(routeMapInstance){routeMapInstance.remove();routeMapInstance=null;}
+    try{
+      const map=new mapboxgl.Map({container:'routeOptMap',style:'mapbox://styles/mapbox/dark-v11',center:[28.4,-25.7],zoom:11});
+      routeMapInstance=map;
+      map.on('load',async()=>{
+        map.resize();
+        const coords=[];
+        const colors={pickup:'#1a7a4a',delivery:'#ff751f'};
+        for(const[key,o]of myActive){
+          const ra=getRestaurantAddrSync(o);
+          if(ra){const g=await geocode(ra);if(g){new mapboxgl.Marker({color:colors.pickup}).setLngLat([g.lng,g.lat]).addTo(map);coords.push([g.lng,g.lat]);}}
+          if(o.status==='out_for_delivery'){const ca=getCustomerAddr(o);if(ca){const g=await geocode(ca);if(g){new mapboxgl.Marker({color:colors.delivery}).setLngLat([g.lng,g.lat]).addTo(map);coords.push([g.lng,g.lat]);}}}
+        }
+        if(coords.length>=2){
+          const coordStr=coords.map(c=>c.join(',')).join(';');
+          try{
+            const r=await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${coordStr}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`);
+            const d=await r.json();
+            if(d.routes&&d.routes[0]){
+              map.addSource('opt-route',{type:'geojson',data:{type:'Feature',properties:{},geometry:d.routes[0].geometry}});
+              map.addLayer({id:'opt-route',type:'line',source:'opt-route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#ff751f','line-width':4,'line-opacity':.85,'line-dasharray':[1,0]}});
+              const bounds=coords.reduce((b,c)=>b.extend(c),new mapboxgl.LngLatBounds(coords[0],coords[0]));
+              map.fitBounds(bounds,{padding:30});
+            }
+          }catch(e){}
+        }else if(coords.length===1){map.setCenter(coords[0]);map.setZoom(13);}
+      });
+    }catch(e){console.error('Route map error:',e);}
+  },300);
+}
+
+window.openGoogleMapsRoute=async function(){
+  if(!routeOptOrders.length)return;
+  const waypoints=[];
+  for(const[key,o]of routeOptOrders){
+    const ra=getRestaurantAddrSync(o);if(ra)waypoints.push(ra);
+    if(o.status==='out_for_delivery'){const ca=getCustomerAddr(o);if(ca)waypoints.push(ca);}
+  }
+  if(!waypoints.length)return;
+  const dest=encodeURIComponent(waypoints[waypoints.length-1]);
+  const wps=waypoints.slice(0,-1).map(w=>`via:${encodeURIComponent(w)}`).join('|');
+  const url=`https://www.google.com/maps/dir/?api=1&destination=${dest}${wps?'&waypoints='+wps:''}`;
+  window.open(url,'_blank');
+};
+
+/* ─── DESKTOP BUILDERS ───────────────────── */
 function buildDeskAvail(key,o){
   const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
   const total=Number(o.total||0).toFixed(2);
@@ -787,11 +1104,14 @@ function buildDeskActive(key,o){
   const st=statusMap[o.status]||{label:o.status,cls:'pill-gray'};
   const customer=getCustomerName(o);
   const delBlock=o.status==='out_for_delivery'?`<div style="background:var(--accent-light);border:1px solid rgba(255,117,31,.2);border-radius:10px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="map-pin" style="width:14px;height:14px;color:var(--accent);flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">② Deliver to Customer</div><div style="font-size:.82rem;font-weight:700;color:var(--text)">${ca||'Address not available'}</div></div></div>`:'';
-  const actionBtn=o.status==='assigned'?`<button onclick="acceptAssignment('${key}')" class="btn btn-success"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Accept & Reveal</button>`:`<button onclick="markDelivered('${key}')" class="btn btn-success"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Delivered</button>`;
-  return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><strong style="font-size:.92rem">${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${st.cls}">${st.label}</span></div><div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="store" style="width:14px;height:14px;color:#1a7a4a;flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:#1a7a4a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">① Pick up from Restaurant</div><div style="font-size:.82rem;font-weight:600;color:#14532d">${ra}</div></div></div>${delBlock}<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:800;color:var(--accent)">R${Number(o.total||0).toFixed(2)}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div></div><div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">${actionBtn}<button onclick="viewOrderDetail('${key}')" class="btn btn-edit"><i data-lucide="map" style="width:13px;height:13px"></i> Map</button><button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger"><i data-lucide="trash-2" style="width:13px;height:13px"></i> Delete</button></div></div></div>`;
+  const proofBlock=o.deliveryProofUrl?`<div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px"><i data-lucide="camera" style="width:13px;height:13px;color:var(--green);flex-shrink:0"></i><span style="font-size:.75rem;color:var(--green);font-weight:700">Photo proof uploaded ✓</span><a href="${o.deliveryProofUrl}" target="_blank" style="font-size:.72rem;color:var(--blue);font-weight:600;margin-left:4px">View</a></div>`:'';
+  const actionBtn=o.status==='assigned'
+    ?`<button onclick="acceptAssignment('${key}')" class="btn btn-success"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Accept & Reveal</button>`
+    :`<button onclick="openProofModal('${key}')" class="btn btn-success"><i data-lucide="camera" style="width:13px;height:13px"></i> Proof & Deliver</button>`;
+  return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><strong style="font-size:.92rem">${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${st.cls}">${st.label}</span></div><div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="store" style="width:14px;height:14px;color:#1a7a4a;flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:#1a7a4a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">① Pick up from Restaurant</div><div style="font-size:.82rem;font-weight:600;color:#14532d">${ra}</div></div></div>${delBlock}${proofBlock}<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:800;color:var(--accent)">R${Number(o.total||0).toFixed(2)}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div></div><div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">${actionBtn}<button onclick="viewOrderDetail('${key}')" class="btn btn-edit"><i data-lucide="map" style="width:13px;height:13px"></i> Map</button><button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger"><i data-lucide="trash-2" style="width:13px;height:13px"></i> Delete</button></div></div></div>`;
 }
 
-// MOBILE CARD BUILDERS
+/* ─── MOBILE CARD BUILDERS ───────────────── */
 const msvg={
   store:`<svg viewBox="0 0 24 24" fill="none" stroke="#1a7a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;margin-top:2px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
   pin:`<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;margin-top:2px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
@@ -799,6 +1119,7 @@ const msvg={
   user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
   map:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`,
   check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="20 6 9 17 4 12"/></svg>`,
+  camera:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
   eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
   trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>`
 };
@@ -811,17 +1132,11 @@ function buildMobAvail(key,o,idx){
   const items=(o.items||[]).length;
   const customer=getCustomerName(o);
   return`<div class="mob-card" style="animation-delay:${idx*.05}s">
-    <div class="mob-card-head">
-      <div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">Order #${orderNum}</div></div>
-      <div class="mob-order-amount">R${total}</div>
-    </div>
+    <div class="mob-card-head"><div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">Order #${orderNum}</div></div><div class="mob-order-amount">R${total}</div></div>
     <div class="mob-addr-row pickup">${msvg.store}<div><div class="mob-addr-lbl">Pick up from</div><div class="mob-addr-val">${ra}</div></div></div>
     <div class="mob-addr-row locked">${msvg.lock}<div><div class="mob-addr-lbl">Delivery address</div><div class="mob-addr-val">Revealed after accepting</div></div></div>
     <div class="mob-card-foot">
-      <div class="mob-meta-row">
-        <span class="mob-chip">${msvg.user} ${customer}</span>
-        <span class="mob-chip">${items} item${items!==1?'s':''}</span>
-      </div>
+      <div class="mob-meta-row"><span class="mob-chip">${msvg.user} ${customer}</span><span class="mob-chip">${items} item${items!==1?'s':''}</span></div>
       <div class="mob-btn-row">
         <button class="mob-btn mob-btn-outline" onclick="viewOrderDetail('${key}')">${msvg.map}</button>
         <button class="mob-btn mob-btn-accept" onclick="acceptDelivery('${key}')">${msvg.check} Accept</button>
@@ -841,21 +1156,16 @@ function buildMobActive(key,o,idx){
   const addrBlock=o.status==='out_for_delivery'&&ca
     ?`<div class="mob-addr-row delivery">${msvg.pin}<div><div class="mob-addr-lbl">② Deliver to</div><div class="mob-addr-val">${ca}</div></div></div>`
     :`<div class="mob-addr-row locked">${msvg.lock}<div><div class="mob-addr-lbl">Customer address</div><div class="mob-addr-val">Accept to reveal</div></div></div>`;
+  const proofBadge=o.deliveryProofUrl?`<span class="mob-chip" style="color:var(--green);border-color:#bbf0d3">${msvg.check} Proof ✓</span>`:'';
   const actionBtn=o.status==='assigned'
     ?`<button class="mob-btn mob-btn-reveal" onclick="acceptAssignment('${key}')">${msvg.eye} Reveal</button>`
-    :`<button class="mob-btn mob-btn-done" onclick="markDelivered('${key}')">${msvg.check} Done</button>`;
+    :`<button class="mob-btn mob-btn-proof" onclick="openProofModal('${key}')">${msvg.camera} Proof</button>`;
   return`<div class="mob-card" style="animation-delay:${idx*.05}s">
-    <div class="mob-card-head">
-      <div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">#${orderNum}</div></div>
-      <span class="mob-status-pill ${stCls}">${stLabel}</span>
-    </div>
+    <div class="mob-card-head"><div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">#${orderNum}</div></div><span class="mob-status-pill ${stCls}">${stLabel}</span></div>
     <div class="mob-addr-row pickup">${msvg.store}<div><div class="mob-addr-lbl">① Pickup from</div><div class="mob-addr-val">${ra}</div></div></div>
     ${addrBlock}
     <div class="mob-card-foot">
-      <div class="mob-meta-row">
-        <span class="mob-chip">${msvg.user} ${customer}</span>
-        <span class="mob-chip" style="color:var(--accent);border-color:rgba(255,117,31,.3)">R${Number(o.total||0).toFixed(2)}</span>
-      </div>
+      <div class="mob-meta-row"><span class="mob-chip">${msvg.user} ${customer}</span><span class="mob-chip" style="color:var(--accent);border-color:rgba(255,117,31,.3)">R${Number(o.total||0).toFixed(2)}</span>${proofBadge}</div>
       <div class="mob-btn-row">
         <button class="mob-btn mob-btn-outline" onclick="viewOrderDetail('${key}')">${msvg.map}</button>
         ${actionBtn}
@@ -865,7 +1175,88 @@ function buildMobActive(key,o,idx){
   </div>`;
 }
 
-// HISTORY
+/* ─── PHOTO PROOF OF DELIVERY ────────────── */
+window.openProofModal=function(key){
+  proofOrderKey=key;
+  proofUploadedUrl=null;
+  const o=ordersCache[key];
+  // If already has proof, skip upload and just mark delivered
+  if(o&&o.deliveryProofUrl){
+    if(confirm('Proof already uploaded. Confirm delivery?')){markDeliveredWithProof(key,o.deliveryProofUrl);}
+    return;
+  }
+  // Reset modal
+  document.getElementById('proofPreviewImg').classList.remove('show');
+  document.getElementById('proofPreviewImg').src='';
+  document.getElementById('proofUploadPrompt').style.display='block';
+  document.getElementById('proofUploadArea').classList.remove('has-photo');
+  document.getElementById('proofUploading').classList.remove('show');
+  document.getElementById('proofSuccessBlock').style.display='none';
+  document.getElementById('confirmDeliveredBtn').disabled=true;
+  document.getElementById('proofFileInput').value='';
+  openModal('proofModal');
+};
+
+window.handleProofPhoto=async function(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  if(file.size>10*1024*1024){showToast('Photo too large — max 10MB','error');return;}
+
+  // Show preview immediately
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('proofPreviewImg');
+    img.src=e.target.result;
+    img.classList.add('show');
+    document.getElementById('proofUploadPrompt').style.display='none';
+  };
+  reader.readAsDataURL(file);
+
+  // Upload to Cloudinary
+  document.getElementById('proofUploading').classList.add('show');
+  document.getElementById('proofUploadArea').classList.remove('has-photo');
+
+  try{
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',CLOUDINARY_PRESET);
+    fd.append('folder','1busket_delivery_proofs');
+
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:fd});
+    const data=await res.json();
+
+    if(data.secure_url){
+      proofUploadedUrl=data.secure_url;
+      document.getElementById('proofUploading').classList.remove('show');
+      document.getElementById('proofSuccessBlock').style.display='block';
+      document.getElementById('proofUploadArea').classList.add('has-photo');
+      document.getElementById('confirmDeliveredBtn').disabled=false;
+    }else{throw new Error('Upload failed');}
+  }catch(e){
+    document.getElementById('proofUploading').classList.remove('show');
+    showToast('Upload failed — try again','error');
+    document.getElementById('proofPreviewImg').classList.remove('show');
+    document.getElementById('proofUploadPrompt').style.display='block';
+    document.getElementById('proofFileInput').value='';
+  }
+};
+
+window.submitProofAndDeliver=async function(){
+  if(!proofOrderKey||!proofUploadedUrl){showToast('Please upload a photo first','error');return;}
+  document.getElementById('confirmDeliveredBtn').disabled=true;
+  document.getElementById('confirmDeliveredBtn').innerHTML='<span style="opacity:.65">Confirming…</span>';
+  await markDeliveredWithProof(proofOrderKey,proofUploadedUrl);
+  hideModal('proofModal');
+};
+
+async function markDeliveredWithProof(key,photoUrl){
+  try{
+    await db.ref('orders/'+key).update({status:'delivered',deliveryProofUrl:photoUrl,deliveredAt:Date.now(),updatedAt:Date.now()});
+    showToast('Delivery confirmed with photo proof! 🎉','success');
+  }catch(e){showToast('Failed to confirm delivery','error');}
+}
+
+/* ─── HISTORY ────────────────────────────── */
 function updateHistoryTab(){
   const entries=Object.entries(ordersCache);
   const hist=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&(o.status==='delivered'||o.status==='cancelled')).sort(([,a],[,b])=>(b.createdAt||0)-(a.createdAt||0));
@@ -880,12 +1271,13 @@ function updateHistoryTab(){
     const sl=o.status==='delivered'?'✓ Delivered':'✗ Cancelled';
     const addr=getCustomerAddr(o)||'Customer address';
     const customer=getCustomerName(o);
-    return`<div class="history-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><strong>${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${sc}">${sl}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div><div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><i data-lucide="map-pin" style="width:13px;height:13px;color:var(--accent);flex-shrink:0"></i><span style="font-size:.78rem;color:var(--dim)">${addr}</span></div><div style="font-size:.75rem;color:var(--dim)">${dateStr} · ${timeStr}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:1.1rem;font-weight:800;color:var(--text)">R${Number(o.total||0).toFixed(2)}</div><div style="font-size:.75rem;color:var(--green);font-weight:700">+R${earn} earned</div><button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger" style="margin-top:8px;padding:5px 12px;font-size:.7rem"><i data-lucide="trash-2" style="width:12px;height:12px"></i> Delete</button></div></div></div>`;
+    const proofBtn=o.deliveryProofUrl?`<a href="${o.deliveryProofUrl}" target="_blank" class="btn btn-success" style="margin-top:6px;padding:5px 12px;font-size:.7rem"><i data-lucide="camera" style="width:12px;height:12px"></i> View Proof</a>`:'';
+    return`<div class="history-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><strong>${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${sc}">${sl}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div><div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><i data-lucide="map-pin" style="width:13px;height:13px;color:var(--accent);flex-shrink:0"></i><span style="font-size:.78rem;color:var(--dim)">${addr}</span></div><div style="font-size:.75rem;color:var(--dim)">${dateStr} · ${timeStr}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:1.1rem;font-weight:800;color:var(--text)">R${Number(o.total||0).toFixed(2)}</div><div style="font-size:.75rem;color:var(--green);font-weight:700">+R${earn} earned</div>${proofBtn}<button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger" style="margin-top:6px;padding:5px 12px;font-size:.7rem"><i data-lucide="trash-2" style="width:12px;height:12px"></i> Delete</button></div></div></div>`;
   }).join('');
   lucide.createIcons();
 }
 
-// EARNINGS
+/* ─── EARNINGS ───────────────────────────── */
 function updateEarningsTab(){
   const orders=Object.values(ordersCache).filter(o=>o.driverKey===DRIVER_KEY&&o.status==='delivered');
   const now=new Date();const todayStr=now.toDateString();
@@ -898,10 +1290,84 @@ function updateEarningsTab(){
   set('earningsToday','R '+todayE.toFixed(2));set('earningsWeek','R '+weekE.toFixed(2));set('earningsMonth','R '+monthE.toFixed(2));set('totalDelivered',orders.length);
 }
 
-// ACTIONS
+/* ─── LEADERBOARD ────────────────────────── */
+const PROVINCES=['All Provinces','Limpopo','Gauteng','Western Cape','KwaZulu-Natal','Eastern Cape','Mpumalanga','North West','Free State','Northern Cape'];
+
+function buildLeaderboardProvinces(){
+  const filter=document.getElementById('provinceFilter');
+  if(!filter)return;
+  filter.innerHTML=PROVINCES.map((p,i)=>`<button class="province-chip${i===0?' active':''}" onclick="filterLeaderboard('${p}',this)">${p}</button>`).join('');
+}
+
+window.filterLeaderboard=function(province,el){
+  selectedProvince=province==='All Provinces'?'':province;
+  document.querySelectorAll('.province-chip').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderLeaderboard();
+};
+
+async function renderLeaderboard(){
+  const container=document.getElementById('leaderboardList');
+  if(!container)return;
+
+  // Get all drivers from Firebase
+  let driversSnap;
+  if(!isOnline){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">📡</div><div style="font-weight:700">Offline — leaderboard unavailable</div></div>`;return;}
+  try{driversSnap=await db.ref('drivers').orderByChild('status').equalTo('active').once('value');}
+  catch(e){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">⚠️</div><div style="font-weight:700">Could not load leaderboard</div></div>`;return;}
+
+  const driversRaw=driversSnap.val()||{};
+  const orders=Object.values(ordersCache);
+  const now=new Date();
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+
+  // Build driver scores
+  let board=Object.entries(driversRaw).map(([key,d])=>{
+    const myOrders=orders.filter(o=>o.driverKey===key&&o.status==='delivered'&&new Date(o.createdAt)>=monthStart);
+    const deliveries=myOrders.length;
+    const earnings=myOrders.reduce((s,o)=>s+Number(o.total||0)*0.15,0);
+    return{key,name:getDriverFullName(d),province:d.province||'',rating:d.rating||5.0,deliveries,earnings,isMe:key===DRIVER_KEY};
+  });
+
+  // Filter by province
+  if(selectedProvince)board=board.filter(d=>d.province===selectedProvince);
+
+  // Sort by deliveries desc, then earnings
+  board.sort((a,b)=>b.deliveries-a.deliveries||b.earnings-a.earnings);
+
+  // Top 10
+  board=board.slice(0,10);
+
+  if(!board.length){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">🏆</div><div style="font-weight:700">No drivers in ${selectedProvince||'this area'} yet</div></div>`;return;}
+
+  const trophies=['🥇','🥈','🥉'];
+  container.innerHTML=board.map((d,i)=>{
+    const rank=i+1;
+    const rankCls=rank<=3?`rank-${rank}`:'';
+    const rankDot=rank<=3?trophies[i]:`#${rank}`;
+    const rankEl=rank<=3?`<div class="leaderboard-trophy">${trophies[i]}</div>`:`<div class="leaderboard-rank leaderboard-rank-default">#${rank}</div>`;
+    const meBadge=d.isMe?`<span class="you-badge">YOU</span>`:'';
+    const init=d.name.charAt(0).toUpperCase();
+    return`<div class="leaderboard-row ${rankCls}${d.isMe?' is-me':''}">
+      ${rankEl}
+      <div class="leaderboard-avatar">${init}</div>
+      <div class="leaderboard-info">
+        <div class="leaderboard-name">${d.name}${meBadge}</div>
+        <div class="leaderboard-sub">${d.province||'SA'} · ★ ${Number(d.rating).toFixed(1)}</div>
+      </div>
+      <div class="leaderboard-score">
+        <div class="leaderboard-deliveries">${d.deliveries} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">del.</span></div>
+        <div class="leaderboard-earn">+R${d.earnings.toFixed(0)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── ACTIONS ────────────────────────────── */
 window.acceptDelivery=function(key){
   if(!DRIVER_KEY||!driverData)return;
-  db.ref('orders/'+key).transaction(cur=>{if(!cur||cur.driverKey)return;cur.driverKey=DRIVER_KEY;cur.driverName=getDriverFullName(driverData);cur.status='out_for_delivery';cur.updatedAt=Date.now();return cur;}).then(r=>{if(r.committed)showToast('Delivery accepted! 🛵 Customer address visible.','success');else showToast('Order already taken by another driver');}).catch(()=>showToast('Failed to accept order'));
+  if(isBusy){showToast('You\'re in busy mode — go online first','error');return;}
+  db.ref('orders/'+key).transaction(cur=>{if(!cur||cur.driverKey)return;cur.driverKey=DRIVER_KEY;cur.driverName=getDriverFullName(driverData);cur.status='out_for_delivery';cur.updatedAt=Date.now();return cur;}).then(r=>{if(r.committed)showToast('Delivery accepted! 🛵 Customer address now visible.','success');else showToast('Order already taken by another driver');}).catch(()=>showToast('Failed to accept order'));
 };
 window.acceptAssignment=function(key){if(!DRIVER_KEY)return;db.ref('orders/'+key).update({status:'out_for_delivery',updatedAt:Date.now()}).then(()=>showToast('Order accepted! Customer address is now visible.','success')).catch(()=>showToast('Failed to accept assignment'));};
 window.markDelivered=function(key){db.ref('orders/'+key).update({status:'delivered',updatedAt:Date.now()}).then(()=>showToast('Order delivered! 🎉','success'));};
@@ -918,10 +1384,7 @@ window.saveDriverProfile=function(){
 };
 window.toggleSetting=function(el,key){el.classList.toggle('on');if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY+'/settings/'+key).set(el.classList.contains('on'));};
 
-// MAP
-const gcCache={};
-async function geocode(addr){if(gcCache[addr])return gcCache[addr];try{const r=await fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(addr)}&access_token=${MAPBOX_TOKEN}&limit=1`);const d=await r.json();if(d.features&&d.features.length>0){const[lng,lat]=d.features[0].geometry.coordinates;gcCache[addr]={lat,lng};return{lat,lng};}}catch(e){}return null;}
-
+/* ─── ORDER DETAIL MODAL WITH MAP ─────────── */
 window.viewOrderDetail=function(key){
   const o=ordersCache[key];if(!o)return;
   const orderNum=o.orderNumber||key.slice(-6);
@@ -930,6 +1393,7 @@ window.viewOrderDetail=function(key){
   const isMyDel=(o.driverKey===DRIVER_KEY&&(o.status==='assigned'||o.status==='out_for_delivery'));
   const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
   const ca=getCustomerAddr(o);
+  const proofSection=o.deliveryProofUrl?`<div class="order-detail-section"><h4>📸 Delivery Proof</h4><img src="${o.deliveryProofUrl}" style="width:100%;border-radius:14px;object-fit:cover;max-height:200px;border:1px solid var(--border)"></div>`:'';
   let addrHTML=isMyDel
     ?`<div class="order-detail-section"><h4>① Pickup — Restaurant Location</h4><div class="addr-display pickup"><i data-lucide="store" style="width:18px;height:18px;color:#1a7a4a;flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:#1a7a4a;margin-bottom:3px">Go here first to collect the order</div><div style="font-weight:700;color:#14532d">${ra}</div></div></div></div><div class="order-detail-section"><h4>② Deliver — Customer Address</h4><div class="addr-display delivery"><i data-lucide="map-pin" style="width:18px;height:18px;color:var(--accent);flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:3px">Deliver here</div><div style="font-weight:700;color:var(--text)">${ca||'Address not provided'}</div></div></div></div>`
     :`<div class="order-detail-section"><h4>Restaurant Pickup Location</h4><div class="addr-display pickup"><i data-lucide="store" style="width:18px;height:18px;color:#1a7a4a;flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:#1a7a4a;margin-bottom:3px">Go here to collect the order</div><div style="font-weight:700;color:#14532d">${ra}</div></div></div></div><div class="order-detail-section"><h4>Customer Delivery Address</h4><div class="addr-display locked"><i data-lucide="lock" style="width:18px;height:18px;color:#92400e;flex-shrink:0"></i><div style="color:#92400e;font-size:.84rem;font-weight:600">Accept this order to reveal the customer's delivery address</div></div></div>`;
@@ -940,8 +1404,12 @@ window.viewOrderDetail=function(key){
   document.getElementById('orderDetailBody').innerHTML=`
     <div class="order-detail-section"><h4>Customer</h4><div class="addr-display"><i data-lucide="user" style="width:18px;height:18px"></i><strong>${customer}</strong></div></div>
     ${addrHTML}
+    ${proofSection}
     <div class="order-detail-section"><h4>Order Items</h4>${itemsHTML||'<p style="color:var(--dim);font-size:.85rem">No items listed</p>'}<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:800;font-size:.95rem"><span>Total</span><span style="color:var(--accent)">R${total}</span></div></div>
-    <div class="order-detail-section"><h4>Directions Map</h4><div class="map-container"><div id="orderMap"></div></div><div style="margin-top:10px"><button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent('${navTarget.replace(/'/g,"\\'")}'),'_blank')" class="btn-primary" style="width:100%;justify-content:center;padding:10px;font-size:.82rem"><i data-lucide="navigation" style="width:14px;height:14px"></i> ${navLabel}</button></div></div>`;
+    <div class="order-detail-section"><h4>Directions Map</h4><div class="map-container"><div id="orderMap"></div></div><div style="margin-top:10px;display:flex;gap:10px">
+      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent('${(navTarget||'').replace(/'/g,"\\'")}'),'_blank')" class="btn-primary" style="flex:1;justify-content:center;padding:10px;font-size:.82rem"><i data-lucide="navigation" style="width:14px;height:14px"></i> ${navLabel}</button>
+      ${isMyDel&&o.status==='out_for_delivery'?`<button onclick="hideModal('orderDetailModal');openProofModal('${key}')" class="btn btn-success" style="padding:10px 16px;font-size:.82rem"><i data-lucide="camera" style="width:14px;height:14px"></i> Add Proof</button>`:''}
+    </div></div>`;
   openModal('orderDetailModal');lucide.createIcons();
   setTimeout(()=>{
     if(currentMapInstance){currentMapInstance.remove();currentMapInstance=null;}
@@ -950,17 +1418,18 @@ window.viewOrderDetail=function(key){
       currentMapInstance=map;map.on('load',()=>map.resize());
       if(o.vendorLat&&o.vendorLng){const vl=[parseFloat(o.vendorLng),parseFloat(o.vendorLat)];new mapboxgl.Marker({color:'#1a7a4a'}).setLngLat(vl).setPopup(new mapboxgl.Popup().setHTML(`<strong>🏪 ${o.vendorName||'Restaurant'}</strong><br>${ra}`)).addTo(map);map.setCenter(vl);}
       else if(ra&&ra!=='Restaurant pickup location'){geocode(ra).then(geo=>{if(geo&&currentMapInstance){new mapboxgl.Marker({color:'#1a7a4a'}).setLngLat([geo.lng,geo.lat]).addTo(currentMapInstance);currentMapInstance.setCenter([geo.lng,geo.lat]);}});}
-      if(isMyDel&&ca){geocode(ca).then(geo=>{if(!geo||!currentMapInstance)return;new mapboxgl.Marker({color:'#ff751f'}).setLngLat([geo.lng,geo.lat]).addTo(currentMapInstance);const vl=[parseFloat(o.vendorLng||0),parseFloat(o.vendorLat||0)];if(o.vendorLat&&o.vendorLng){fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${vl[0]},${vl[1]};${geo.lng},${geo.lat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`).then(r=>r.json()).then(rd=>{if(!currentMapInstance||!rd.routes||!rd.routes.length)return;if(currentMapInstance.getSource('route'))currentMapInstance.getSource('route').setData({type:'Feature',properties:{},geometry:rd.routes[0].geometry});else{currentMapInstance.addSource('route',{type:'geojson',data:{type:'Feature',properties:{},geometry:rd.routes[0].geometry}});currentMapInstance.addLayer({id:'route',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#ff751f','line-width':4,'line-opacity':.8}});}const bounds=new mapboxgl.LngLatBounds().extend(vl).extend([geo.lng,geo.lat]);currentMapInstance.fitBounds(bounds,{padding:40});});}else currentMapInstance.setCenter([geo.lng,geo.lat]);});}
+      if(isMyDel&&ca){geocode(ca).then(geo=>{if(!geo||!currentMapInstance)return;new mapboxgl.Marker({color:'#ff751f'}).setLngLat([geo.lng,geo.lat]).addTo(currentMapInstance);const vll=[parseFloat(o.vendorLng||0),parseFloat(o.vendorLat||0)];if(o.vendorLat&&o.vendorLng){fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${vll[0]},${vll[1]};${geo.lng},${geo.lat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`).then(r=>r.json()).then(rd=>{if(!currentMapInstance||!rd.routes||!rd.routes.length)return;if(currentMapInstance.getSource('route'))currentMapInstance.getSource('route').setData({type:'Feature',properties:{},geometry:rd.routes[0].geometry});else{currentMapInstance.addSource('route',{type:'geojson',data:{type:'Feature',properties:{},geometry:rd.routes[0].geometry}});currentMapInstance.addLayer({id:'route',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#ff751f','line-width':4,'line-opacity':.8}});}const bounds=new mapboxgl.LngLatBounds().extend(vll).extend([geo.lng,geo.lat]);currentMapInstance.fitBounds(bounds,{padding:40});});}else currentMapInstance.setCenter([geo.lng,geo.lat]);});}
     }catch(e){console.error('Map error:',e);}
   },300);
 };
 
-// NAVIGATION
+/* ─── NAVIGATION ─────────────────────────── */
 function showTab(id,el){
   document.querySelectorAll('#driverMainPanel .page-content').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('#driverSidebar .nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(el)el.classList.add('active');else{const t=document.querySelector(`.nav-item[onclick="showTab('${id}',this)"]`);if(t)t.classList.add('active');}
+  if(el)el.classList.add('active');
+  if(id==='leaderboard')renderLeaderboard();
   lucide.createIcons();
 }
 function mobileTab(pageId,btnId){
@@ -968,10 +1437,11 @@ function mobileTab(pageId,btnId){
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
   const page=document.getElementById(pageId);if(page)page.classList.add('active');
   const btn=document.getElementById(btnId);if(btn)btn.classList.add('active');
+  if(pageId==='leaderboard')renderLeaderboard();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// MODALS
+/* ─── MODALS ─────────────────────────────── */
 function openModal(id){const el=document.getElementById(id);el.style.display='flex';setTimeout(()=>{el.classList.add('active');lucide.createIcons();},10);}
 function hideModal(id){const el=document.getElementById(id);el.classList.remove('active');setTimeout(()=>el.style.display='none',350);}
 
@@ -979,11 +1449,12 @@ function confirmLogout(){
   locBannerShown=false;
   localStorage.removeItem('1busket_driver_session');
   if(locationWatcher){navigator.geolocation.clearWatch(locationWatcher);locationWatcher=null;}
+  if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({isBusy:false,lastSeen:Date.now()});
   hideModal('logoutModal');
   window.location.href='login.html';
 }
 
-// TOAST
+/* ─── TOAST ──────────────────────────────── */
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
   document.getElementById('toastMsg').textContent=msg;
@@ -991,7 +1462,7 @@ function showToast(msg,type='success'){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show','success','error'),2800);
 }
 
-// SIDEBAR HOVER
+/* ─── SIDEBAR HOVER ──────────────────────── */
 const sidebar=document.getElementById('driverSidebar');
 if(sidebar){
   sidebar.addEventListener('mouseenter',()=>{sidebar.classList.add('expanded');document.getElementById('driverMainPanel').classList.add('shifted');});
