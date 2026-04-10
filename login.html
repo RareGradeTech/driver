@@ -24,6 +24,7 @@
             --text-muted: #a09a92;
             --danger: #d93025;
             --green: #1a7a4a;
+            --blue: #1a56a0;
             --radius: 16px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
             --shadow: 0 4px 16px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
@@ -133,6 +134,7 @@
         /* ── GATE CARD ── */
         #initialGoogleCard { text-align: center; }
         #mainAuthCard { display: none; }
+        #forgotDriverIdCard { display: none; }
         .gate-icon { width: 68px; height: 68px; background: var(--accent-light); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid var(--accent-muted); }
 
         /* ── BADGE ── */
@@ -154,7 +156,40 @@
         }
         .security-notice svg { flex-shrink: 0; margin-top: 1px; }
 
-        /* ── REGISTER MODAL ── */
+        /* ── FORGOT DRIVER ID ── */
+        .forgot-link {
+            text-align: center; margin-top: 10px; font-size: 0.8rem; color: var(--dim);
+        }
+        .forgot-link a { color: var(--accent); font-weight: 700; text-decoration: none; cursor: pointer; }
+        .forgot-link a:hover { text-decoration: underline; }
+
+        .info-box {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 16px; font-size: 0.82rem; color: var(--dim); line-height: 1.7;
+        }
+        .info-box strong { color: var(--text); }
+
+        /* ── WHAT YOU NEED CHECKLIST ── */
+        .needs-checklist {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 16px;
+            padding: 16px; margin-bottom: 20px; text-align: left;
+        }
+        .needs-checklist-title {
+            font-size: 0.7rem; font-weight: 700; color: var(--dim); text-transform: uppercase;
+            letter-spacing: 0.6px; margin-bottom: 12px;
+        }
+        .needs-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; font-weight: 600;
+        }
+        .needs-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .needs-icon {
+            width: 30px; height: 30px; border-radius: 10px; background: var(--accent-light);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        /* ── REGISTRATION MODAL ── */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(10,8,6,0.55); backdrop-filter: blur(14px);
@@ -194,8 +229,26 @@
 
         .modal-body { padding: 20px 28px 30px; }
 
+        /* ── PROGRESS BAR ── */
+        .progress-wrap { margin-bottom: 18px; }
+        .progress-label {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px;
+        }
+        .progress-label span { font-size: 0.7rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
+        .progress-label .pct { color: var(--accent); font-weight: 800; }
+        .progress-bar-track {
+            height: 6px; background: var(--border); border-radius: 999px; overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, #ff9a56, #ff751f);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
         /* Step track */
-        .step-track { display: flex; gap: 6px; margin-bottom: 22px; }
+        .step-track { display: flex; gap: 6px; margin-bottom: 14px; }
         .step-pip { height: 5px; border-radius: 999px; background: var(--border); transition: var(--transition); flex: 1; }
         .step-pip.done { background: var(--accent-muted); }
         .step-pip.active { background: var(--accent); }
@@ -203,20 +256,121 @@
         .reg-step { display: none; }
         .reg-step.active { display: block; }
 
-        /* Success screen */
+        /* ── FILE UPLOAD ── */
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .upload-box {
+            border: 2px dashed var(--border); border-radius: 14px; padding: 16px 10px;
+            text-align: center; cursor: pointer; transition: var(--transition); position: relative;
+            background: var(--surface2);
+        }
+        .upload-box:hover { border-color: var(--accent); background: var(--accent-light); }
+        .upload-box.has-file { border-color: var(--green); background: #edf9f2; border-style: solid; }
+        .upload-box.uploading { border-color: var(--accent); opacity: 0.7; pointer-events: none; }
+        .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .upload-label { font-size: 0.73rem; font-weight: 700; color: var(--dim); line-height: 1.4; }
+        .upload-sublabel { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+        .upload-status { font-size: 0.68rem; font-weight: 700; color: var(--green); margin-top: 4px; }
+        .upload-box.has-file .upload-status::before { content: '✓ '; }
+
+        /* ── APP TRACKER ── */
+        .tracker-modal { max-width: 400px; }
+        .tracker-steps { margin: 16px 0; }
+        .tracker-step {
+            display: flex; gap: 12px; align-items: flex-start; padding: 10px 0;
+            position: relative;
+        }
+        .tracker-step:not(:last-child)::after {
+            content: ''; position: absolute; left: 15px; top: 38px;
+            width: 2px; height: calc(100% - 10px); background: var(--border);
+        }
+        .tracker-dot {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 800; z-index: 1;
+        }
+        .tracker-dot.done { background: #edf9f2; border: 2px solid var(--green); color: var(--green); }
+        .tracker-dot.active { background: var(--accent-light); border: 2px solid var(--accent); color: var(--accent); }
+        .tracker-dot.pending { background: var(--surface2); border: 2px solid var(--border); color: var(--text-muted); }
+        .tracker-info h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+        .tracker-info p { font-size: 0.76rem; color: var(--dim); }
+        .tracker-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 999px; font-size: 0.68rem; font-weight: 700;
+            margin-left: 6px; vertical-align: middle;
+        }
+        .tracker-badge.pending { background: #fef9c3; color: #92400e; }
+        .tracker-badge.active { background: #edf9f2; color: var(--green); }
+
+        /* ── SUCCESS SCREEN ── */
         .success-screen { text-align: center; padding: 8px 0; }
         .success-icon { width: 72px; height: 72px; border-radius: 50%; background: #edf9f2; border: 2px solid #bbf0d3; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 2rem; }
         .success-screen h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
         .success-screen p { font-size: 0.84rem; color: var(--dim); line-height: 1.6; }
 
-        .steps-info { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin: 16px 0 20px; text-align: left; }
+        .driver-id-preview {
+            background: linear-gradient(135deg, var(--accent-light), #fff8f2);
+            border: 2px dashed var(--accent-muted); border-radius: 16px;
+            padding: 16px; margin: 16px 0; text-align: center;
+        }
+        .driver-id-preview-label { font-size: 0.65rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 6px; }
+        .driver-id-preview-id { font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: 2px; font-family: monospace; }
+        .driver-id-preview-note { font-size: 0.7rem; color: var(--text-muted); margin-top: 5px; }
+
+        .steps-info { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin: 16px 0; text-align: left; }
         .steps-info-title { font-size: 0.68rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .steps-info-body { font-size: 0.82rem; color: var(--dim); line-height: 1.7; }
+
+        .success-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+        .btn-wa {
+            background: #25D366; color: white; border: none; padding: 12px 20px;
+            border-radius: 999px; font-weight: 700; font-family: inherit; font-size: 0.88rem;
+            cursor: pointer; transition: var(--transition); width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+        }
+        .btn-wa:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(37,211,102,0.4); }
+        .btn-track {
+            background: var(--surface2); color: var(--text); border: 1.5px solid var(--border);
+            padding: 12px 20px; border-radius: 999px; font-weight: 700; font-family: inherit; font-size: 0.88rem;
+            cursor: pointer; transition: var(--transition); width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-track:hover { background: var(--border); }
+        .btn-notif {
+            background: #eef2ff; color: #4338ca; border: 1.5px solid #c7d2fe;
+            padding: 12px 20px; border-radius: 999px; font-weight: 700; font-family: inherit; font-size: 0.88rem;
+            cursor: pointer; transition: var(--transition); width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-notif:hover { background: #e0e7ff; }
+        .btn-notif.granted { background: #edf9f2; color: var(--green); border-color: #bbf0d3; cursor: default; }
+
+        /* ── TRACKER MODAL ── */
+        .tracker-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(10,8,6,0.55); backdrop-filter: blur(14px);
+            z-index: 9500; justify-content: center; align-items: center;
+            padding: 20px; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .tracker-overlay.open { display: flex; }
+        .tracker-overlay.visible { opacity: 1; }
+        .tracker-box {
+            background: var(--surface); border-radius: 28px;
+            width: 100%; max-width: 400px; box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+            transform: scale(0.92) translateY(28px);
+            transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+            border: 1px solid var(--border); overflow: hidden;
+        }
+        .tracker-overlay.visible .tracker-box { transform: scale(1) translateY(0); }
+        .tracker-header { padding: 24px 24px 0; display: flex; justify-content: space-between; align-items: center; }
+        .tracker-body { padding: 16px 24px 28px; }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 480px) {
             .auth-card { padding: 32px 22px; border-radius: 22px; }
             .auth-form-row { grid-template-columns: 1fr; }
+            .upload-grid { grid-template-columns: 1fr; }
             .modal-header { padding: 20px 20px 0; }
             .modal-body { padding: 16px 20px 24px; }
         }
@@ -267,13 +421,11 @@
     <h2 style="font-size:1.4rem;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px;">Welcome back 🛵</h2>
     <p style="font-size:0.84rem;color:var(--dim);margin-bottom:20px;">Enter your Driver ID to access your portal.</p>
 
-    <!-- Google verified badge -->
     <div class="google-verified-badge" id="googleBadge" style="display:none;">
         <div class="google-icon"></div>
         <span>Verified as <strong id="googleBadgeEmail"></strong></span>
     </div>
 
-    <!-- Security notice -->
     <div class="security-notice">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Your Driver ID must match the Google account you signed in with. You can only use your own Driver ID.
@@ -291,10 +443,58 @@
         Sign In to Portal
     </button>
 
-    <p style="margin-top:18px;font-size:0.78rem;color:var(--dim);text-align:center;">
+    <!-- FORGOT DRIVER ID LINK -->
+    <p class="forgot-link">
+        Forgot your Driver ID?
+        <a onclick="showForgotDriverId();return false;">Recover it</a>
+    </p>
+
+    <p style="margin-top:12px;font-size:0.78rem;color:var(--dim);text-align:center;">
         Wrong account?
         <a href="#" onclick="resetToGate();return false;" style="color:var(--accent);font-weight:700;text-decoration:none;">Switch Google account</a>
     </p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FORGOT DRIVER ID CARD
+     ═══════════════════════════════════════════ -->
+<div class="auth-card" id="forgotDriverIdCard">
+    <button onclick="backFromForgot()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:700;color:var(--dim);margin-bottom:20px;padding:0;font-family:inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Sign In
+    </button>
+
+    <div style="width:52px;height:52px;background:var(--accent-light);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid var(--accent-muted);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+
+    <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:6px;">Forgot Your Driver ID?</h2>
+    <p style="font-size:0.84rem;color:var(--dim);margin-bottom:20px;line-height:1.6;">We'll look up your Driver ID using the Google account you verified with. Your ID is tied to your email address.</p>
+
+    <div class="info-box">
+        <strong>How this works:</strong><br>
+        We use your verified Google email (<strong id="forgotEmailDisplay"></strong>) to look up your driver record and display your assigned Driver ID.
+    </div>
+
+    <div class="auth-error" id="forgotError"></div>
+    <div class="auth-success" id="forgotSuccess" style="display:none;"></div>
+
+    <div id="forgotResult" style="display:none;">
+        <div class="driver-id-preview" style="margin:0 0 16px;">
+            <div class="driver-id-preview-label">Your Driver ID</div>
+            <div class="driver-id-preview-id" id="forgotDriverIdResult">—</div>
+            <div class="driver-id-preview-note">Use this to sign in to your portal</div>
+        </div>
+        <button class="auth-btn" onclick="useForgottenId()" style="margin-top:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Use This ID to Sign In
+        </button>
+    </div>
+
+    <button class="auth-btn" onclick="lookupDriverId()" id="lookupBtn" style="display:block;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Look Up My Driver ID
+    </button>
 </div>
 
 
@@ -320,7 +520,18 @@
                 <span>Registering as <strong id="regGoogleEmail"></strong></span>
             </div>
 
-            <!-- Step progress track (shown from step 1 onward) -->
+            <!-- Progress bar (shown from step 1 onward) -->
+            <div class="progress-wrap" id="regProgressWrap" style="display:none;">
+                <div class="progress-label">
+                    <span id="progressStepLabel">Step 1 of 2 — Personal Details</span>
+                    <span class="pct" id="progressPct">50%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+            </div>
+
+            <!-- Step track pips -->
             <div class="step-track" id="regStepTrack" style="display:none;">
                 <div class="step-pip active" id="rpip-0"></div>
                 <div class="step-pip" id="rpip-1"></div>
@@ -329,10 +540,49 @@
 
             <div class="auth-error" id="regModalError"></div>
 
-            <!-- ── STEP 0: Google verification ── -->
+            <!-- ── STEP 0: What you'll need + Google verification ── -->
             <div class="reg-step active" id="rStep0">
-                <p style="font-size:0.88rem;color:var(--dim);line-height:1.6;margin-bottom:20px;">
-                    To register, first verify your identity with Google. Your account will be <strong>permanently tied to this email address</strong> — you'll use it every time you sign in.
+                <div class="needs-checklist">
+                    <div class="needs-checklist-title">📋 What you'll need to register</div>
+                    <div class="needs-item">
+                        <div class="needs-icon">🪪</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;">Valid SA ID or Passport</div>
+                            <div style="font-size:0.72rem;color:var(--dim);">For identity verification</div>
+                        </div>
+                    </div>
+                    <div class="needs-item">
+                        <div class="needs-icon">📄</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;">Driver's License</div>
+                            <div style="font-size:0.72rem;color:var(--dim);">Valid and not expired</div>
+                        </div>
+                    </div>
+                    <div class="needs-item">
+                        <div class="needs-icon">🛵</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;">Your Vehicle + Registration</div>
+                            <div style="font-size:0.72rem;color:var(--dim);">Motorcycle, scooter, car or bicycle</div>
+                        </div>
+                    </div>
+                    <div class="needs-item">
+                        <div class="needs-icon">📱</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;">Smartphone with GPS</div>
+                            <div style="font-size:0.72rem;color:var(--dim);">For the 1BUSKET driver app</div>
+                        </div>
+                    </div>
+                    <div class="needs-item">
+                        <div class="needs-icon">🏦</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;">Bank Account</div>
+                            <div style="font-size:0.72rem;color:var(--dim);">For receiving your payouts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size:0.84rem;color:var(--dim);line-height:1.6;margin-bottom:18px;">
+                    Verify your identity with Google. Your account will be <strong>permanently tied to this email address</strong>.
                 </p>
                 <button class="btn-google" onclick="googleRegisterAuth()" id="regGoogleBtn">
                     <div class="google-icon"></div>
@@ -376,7 +626,7 @@
                 </button>
             </div>
 
-            <!-- ── STEP 2: Vehicle & ID details ── -->
+            <!-- ── STEP 2: Vehicle & ID details + uploads ── -->
             <div class="reg-step" id="rStep2">
                 <div class="auth-form-row">
                     <div class="auth-form-group">
@@ -404,6 +654,49 @@
                     <label>Bank Account Details *</label>
                     <input type="text" class="auth-input" id="r-bank" placeholder="Bank name, branch & account no.">
                 </div>
+
+                <!-- Document Upload Section -->
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:0.71rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">
+                        Upload Documents
+                        <span style="font-weight:500;color:var(--text-muted);text-transform:none;letter-spacing:0;"> — speeds up your approval</span>
+                    </div>
+                    <div class="upload-grid">
+                        <!-- Vehicle Photo -->
+                        <div class="upload-box" id="uploadBox-vehicle" onclick="triggerUpload('vehicle')">
+                            <input type="file" id="fileInput-vehicle" accept="image/*" onchange="handleUpload('vehicle', this)" onclick="event.stopPropagation()">
+                            <div class="upload-icon">🛵</div>
+                            <div class="upload-label">Vehicle Photo</div>
+                            <div class="upload-sublabel">JPEG / PNG</div>
+                            <div class="upload-status" id="uploadStatus-vehicle"></div>
+                        </div>
+                        <!-- Driver's License -->
+                        <div class="upload-box" id="uploadBox-dlicense" onclick="triggerUpload('dlicense')">
+                            <input type="file" id="fileInput-dlicense" accept="image/*,application/pdf" onchange="handleUpload('dlicense', this)" onclick="event.stopPropagation()">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-label">Driver's License (Front)</div>
+                            <div class="upload-sublabel">JPEG / PDF</div>
+                            <div class="upload-status" id="uploadStatus-dlicense"></div>
+                        </div>
+                        <!-- SA ID / Passport -->
+                        <div class="upload-box" id="uploadBox-idbook" onclick="triggerUpload('idbook')">
+                            <input type="file" id="fileInput-idbook" accept="image/*,application/pdf" onchange="handleUpload('idbook', this)" onclick="event.stopPropagation()">
+                            <div class="upload-icon">🪪</div>
+                            <div class="upload-label">SA ID / Passport</div>
+                            <div class="upload-sublabel">JPEG / PDF</div>
+                            <div class="upload-status" id="uploadStatus-idbook"></div>
+                        </div>
+                        <!-- Proof of Ownership -->
+                        <div class="upload-box" id="uploadBox-ownership" onclick="triggerUpload('ownership')">
+                            <input type="file" id="fileInput-ownership" accept="image/*,application/pdf" onchange="handleUpload('ownership', this)" onclick="event.stopPropagation()">
+                            <div class="upload-icon">📋</div>
+                            <div class="upload-label">Proof of Ownership</div>
+                            <div class="upload-sublabel">Optional</div>
+                            <div class="upload-status" id="uploadStatus-ownership"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="display:flex;gap:10px;margin-top:6px;">
                     <button class="btn-outline" style="flex:1;" onclick="regModalBack(2)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -422,6 +715,14 @@
                     <div class="success-icon">🎉</div>
                     <h3>Application Submitted!</h3>
                     <p>Your application is now in the admin queue for review.</p>
+
+                    <!-- Driver ID Preview -->
+                    <div class="driver-id-preview">
+                        <div class="driver-id-preview-label">Your Pending Driver ID</div>
+                        <div class="driver-id-preview-id" id="pendingDriverIdPreview">DRV-———</div>
+                        <div class="driver-id-preview-note">This is your preview ID — it will be confirmed &amp; activated once approved by admin</div>
+                    </div>
+
                     <div class="steps-info">
                         <div class="steps-info-title">What happens next</div>
                         <div class="steps-info-body">
@@ -431,10 +732,73 @@
                             ④ Start delivering!
                         </div>
                     </div>
-                    <button class="btn-outline" onclick="closeRegisterModal()">Close</button>
+
+                    <div class="success-actions">
+                        <button class="btn-track" onclick="openTrackerModal()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            Track My Application
+                        </button>
+                        <button class="btn-wa" onclick="shareOnWhatsApp()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            Share on WhatsApp
+                        </button>
+                        <button class="btn-notif" id="notifBtn" onclick="requestPushPermission()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                            Enable Order Notifications
+                        </button>
+                        <button class="btn-outline" onclick="closeRegisterModal()">Close</button>
+                    </div>
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     APPLICATION TRACKER MODAL
+     ═══════════════════════════════════════════ -->
+<div class="tracker-overlay" id="trackerModal">
+    <div class="tracker-box">
+        <div class="tracker-header">
+            <div>
+                <h3 style="font-size:1.1rem;font-weight:800;letter-spacing:-0.2px;">Application Status</h3>
+                <p style="font-size:0.78rem;color:var(--dim);margin-top:2px;" id="trackerSubtitle">Tracking your application</p>
+            </div>
+            <button class="modal-close" onclick="closeTrackerModal()">✕</button>
+        </div>
+        <div class="tracker-body">
+            <div class="tracker-steps">
+                <div class="tracker-step">
+                    <div class="tracker-dot done">✓</div>
+                    <div class="tracker-info">
+                        <h4>Application Submitted</h4>
+                        <p>Your details have been received by 1BUSKET.</p>
+                    </div>
+                </div>
+                <div class="tracker-step">
+                    <div class="tracker-dot active" id="trackerDot2">⋯</div>
+                    <div class="tracker-info">
+                        <h4>Admin Review <span class="tracker-badge pending" id="trackerBadge">Pending</span></h4>
+                        <p>Our team is reviewing your documents &amp; details.</p>
+                    </div>
+                </div>
+                <div class="tracker-step">
+                    <div class="tracker-dot pending" id="trackerDot3">3</div>
+                    <div class="tracker-info">
+                        <h4>Driver ID Issued</h4>
+                        <p>You'll receive your unique Driver ID upon approval.</p>
+                    </div>
+                </div>
+                <div class="tracker-step">
+                    <div class="tracker-dot pending" id="trackerDot4">4</div>
+                    <div class="tracker-info">
+                        <h4>Account Activated</h4>
+                        <p>Sign in and start delivering!</p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-outline" onclick="closeTrackerModal()" style="margin-top:4px;">Close</button>
         </div>
     </div>
 </div>
@@ -455,11 +819,24 @@ firebase.initializeApp(firebaseConfig);
 const db   = firebase.database();
 const auth = firebase.auth();
 
+/* ─── Cloudinary config ─────────────────── */
+const CLOUDINARY_CLOUD  = 'your_cloud_name';   // ← Replace
+const CLOUDINARY_PRESET = 'your_upload_preset'; // ← Replace (unsigned)
+
 /* ─── State ──────────────────────────────── */
-let verifiedGoogleUser = null;   // Google user who passed the gate (for sign-in)
-let registerGoogleUser = null;   // Google user used during registration
+let verifiedGoogleUser = null;
+let registerGoogleUser = null;
 let currentRegStep     = 0;
-const TOTAL_REG_PIPS   = 3;      // pips for steps 1, 2, (3=success has no pip)
+const TOTAL_REG_PIPS   = 3;
+let uploadedDocs       = {};   // { vehicle: url, dlicense: url, idbook: url, ownership: url }
+let pendingApplicationKey = null;
+
+/* ─── Step progress config ── */
+const STEP_CONFIG = [
+    null, // step 0 has no progress bar
+    { label: 'Step 1 of 2 — Personal Details',   pct: 50  },
+    { label: 'Step 2 of 2 — Vehicle & Documents', pct: 100 },
+];
 
 /* ─── Session guard ──────────────────────── */
 (function checkSession() {
@@ -487,7 +864,6 @@ async function initialGoogleSignIn() {
         const result = await auth.signInWithPopup(provider);
         const user   = result.user;
 
-        // Must have a driver record
         const snap = await db.ref('drivers').orderByChild('email').equalTo(user.email).once('value');
         if (!snap.val()) {
             await auth.signOut();
@@ -507,7 +883,6 @@ async function initialGoogleSignIn() {
 
         verifiedGoogleUser = user;
 
-        // Transition to Driver ID sign-in card
         document.getElementById('initialGoogleCard').style.display = 'none';
         document.getElementById('mainAuthCard').style.display      = 'block';
         document.getElementById('googleBadge').style.display       = 'flex';
@@ -526,7 +901,7 @@ async function initialGoogleSignIn() {
 
 
 /* ═══════════════════════════════════════════════
-   MAIN SIGN-IN — Driver ID (email-bound security)
+   MAIN SIGN-IN — Driver ID
    ═══════════════════════════════════════════════ */
 async function partnerLogin() {
     const id  = document.getElementById('driverLoginId').value.trim().toUpperCase();
@@ -552,10 +927,6 @@ async function partnerLogin() {
         const key    = Object.keys(snap.val())[0];
         const driver = snap.val()[key];
 
-        /* ── CORE SECURITY CHECK ─────────────────────────────────────
-           The Driver ID must belong to the Google account that signed in.
-           This prevents any driver from using another driver's ID.
-        ──────────────────────────────────────────────────────────── */
         if (!driver.email || driver.email.toLowerCase() !== verifiedGoogleUser.email.toLowerCase()) {
             throw new Error('This Driver ID does not belong to your Google account. You can only sign in with your own Driver ID.');
         }
@@ -565,11 +936,7 @@ async function partnerLogin() {
         }
 
         localStorage.setItem('1busket_driver_session', JSON.stringify({
-            key,
-            id,
-            role:      'driver',
-            email:     verifiedGoogleUser.email,
-            loggedAt:  Date.now()
+            key, id, role: 'driver', email: verifiedGoogleUser.email, loggedAt: Date.now()
         }));
 
         window.location.href = 'index.html';
@@ -582,17 +949,79 @@ async function partnerLogin() {
     }
 }
 
-/* Reset gate */
 function resetToGate() {
     verifiedGoogleUser = null;
     auth.signOut().catch(() => {});
     document.getElementById('mainAuthCard').style.display       = 'none';
+    document.getElementById('forgotDriverIdCard').style.display  = 'none';
     document.getElementById('initialGoogleCard').style.display  = 'block';
     document.getElementById('googleVerifyBtn').disabled         = false;
     document.getElementById('googleVerifyBtn').innerHTML        = '<div class="google-icon"></div> Sign In with Google';
     document.getElementById('initialGoogleError').style.display = 'none';
     document.getElementById('loginError').style.display         = 'none';
     document.getElementById('driverLoginId').value              = '';
+}
+
+
+/* ═══════════════════════════════════════════════
+   FORGOT DRIVER ID FLOW
+   ═══════════════════════════════════════════════ */
+function showForgotDriverId() {
+    if (!verifiedGoogleUser) return;
+    document.getElementById('mainAuthCard').style.display      = 'none';
+    document.getElementById('forgotDriverIdCard').style.display = 'block';
+    document.getElementById('forgotEmailDisplay').textContent   = verifiedGoogleUser.email;
+    document.getElementById('forgotError').style.display        = 'none';
+    document.getElementById('forgotResult').style.display       = 'none';
+    document.getElementById('lookupBtn').style.display          = 'block';
+}
+
+function backFromForgot() {
+    document.getElementById('forgotDriverIdCard').style.display = 'none';
+    document.getElementById('mainAuthCard').style.display       = 'block';
+}
+
+async function lookupDriverId() {
+    const err = document.getElementById('forgotError');
+    const btn = document.getElementById('lookupBtn');
+    err.style.display = 'none';
+
+    if (!verifiedGoogleUser) {
+        err.textContent = 'Session expired. Please go back and verify with Google again.';
+        err.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span style="opacity:.65;">Looking up…</span>';
+
+    try {
+        const snap = await db.ref('drivers').orderByChild('email').equalTo(verifiedGoogleUser.email).once('value');
+        if (!snap.val()) throw new Error('No driver record found for this Google account.');
+
+        const driver = Object.values(snap.val())[0];
+
+        if (!driver.driverID) {
+            throw new Error('Your Driver ID has not been assigned yet. Please wait for admin approval.');
+        }
+
+        document.getElementById('forgotDriverIdResult').textContent = driver.driverID;
+        document.getElementById('forgotResult').style.display       = 'block';
+        btn.style.display = 'none';
+
+    } catch (e) {
+        err.textContent = e.message;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Look Up My Driver ID`;
+    }
+}
+
+function useForgottenId() {
+    const id = document.getElementById('forgotDriverIdResult').textContent;
+    document.getElementById('forgotDriverIdCard').style.display = 'none';
+    document.getElementById('mainAuthCard').style.display       = 'block';
+    document.getElementById('driverLoginId').value              = id;
 }
 
 
@@ -612,7 +1041,6 @@ function closeRegisterModal() {
     setTimeout(() => { overlay.classList.remove('open'); resetRegModal(); }, 320);
 }
 
-// Close on backdrop click
 document.getElementById('registerModal').addEventListener('click', function(e) {
     if (e.target === this) closeRegisterModal();
 });
@@ -620,15 +1048,17 @@ document.getElementById('registerModal').addEventListener('click', function(e) {
 function resetRegModal() {
     currentRegStep     = 0;
     registerGoogleUser = null;
+    uploadedDocs       = {};
+    pendingApplicationKey = null;
 
-    goToRegStep(0, false);  // false = don't show track
+    goToRegStep(0, false);
     document.getElementById('regStepTrack').style.display    = 'none';
+    document.getElementById('regProgressWrap').style.display = 'none';
     document.getElementById('regGoogleBadge').style.display  = 'none';
     document.getElementById('regModalError').style.display   = 'none';
     document.getElementById('modalTitle').textContent         = 'Apply as a Driver';
     document.getElementById('modalSubtitle').textContent      = 'Join the 1BUSKET driver network';
 
-    // Reset fields
     ['r-name','r-city','r-phone','r-email','r-license','r-idnumber','r-emergency','r-bank'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -636,10 +1066,24 @@ function resetRegModal() {
     const prov = document.getElementById('r-province'); if (prov) prov.value = '';
     const veh  = document.getElementById('r-vehicle');  if (veh)  veh.value  = '';
 
+    // Reset upload boxes
+    ['vehicle','dlicense','idbook','ownership'].forEach(type => {
+        const box = document.getElementById('uploadBox-' + type);
+        const input = document.getElementById('fileInput-' + type);
+        const status = document.getElementById('uploadStatus-' + type);
+        if (box) { box.className = 'upload-box'; }
+        if (input) input.value = '';
+        if (status) status.textContent = '';
+    });
+
     const gBtn = document.getElementById('regGoogleBtn');
     if (gBtn) { gBtn.disabled = false; gBtn.innerHTML = '<div class="google-icon"></div> Continue with Google'; }
     const sBtn = document.getElementById('rSubmitBtn');
     if (sBtn) { sBtn.disabled = false; sBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit Application'; }
+
+    // Reset notif button
+    const nBtn = document.getElementById('notifBtn');
+    if (nBtn) { nBtn.className = 'btn-notif'; nBtn.textContent = ''; nBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Enable Order Notifications'; }
 }
 
 function goToRegStep(step, showTrack = true) {
@@ -650,19 +1094,31 @@ function goToRegStep(step, showTrack = true) {
     document.getElementById('regModalError').style.display = 'none';
 
     if (showTrack && step >= 1 && step <= 2) {
-        document.getElementById('regStepTrack').style.display = 'flex';
+        document.getElementById('regStepTrack').style.display    = 'flex';
+        document.getElementById('regProgressWrap').style.display = 'block';
         updateRegPips();
+        updateProgressBar(step);
+    } else if (step === 0 || step === 3) {
+        document.getElementById('regStepTrack').style.display    = 'none';
+        document.getElementById('regProgressWrap').style.display = 'none';
     }
 }
 
 function updateRegPips() {
-    // pip 0 = step1, pip 1 = step2
     const pipIdx = currentRegStep - 1;
     for (let i = 0; i < TOTAL_REG_PIPS; i++) {
         const pip = document.getElementById('rpip-' + i);
         if (!pip) continue;
         pip.className = 'step-pip' + (i < pipIdx ? ' done' : i === pipIdx ? ' active' : '');
     }
+}
+
+function updateProgressBar(step) {
+    const cfg = STEP_CONFIG[step];
+    if (!cfg) return;
+    document.getElementById('progressStepLabel').textContent = cfg.label;
+    document.getElementById('progressPct').textContent       = cfg.pct + '%';
+    document.getElementById('progressBarFill').style.width   = cfg.pct + '%';
 }
 
 /* ── Step 0: Google auth for new registrations ── */
@@ -680,7 +1136,6 @@ async function googleRegisterAuth() {
         const result = await auth.signInWithPopup(provider);
         const user   = result.user;
 
-        // Check not already registered
         const snap = await db.ref('drivers').orderByChild('email').equalTo(user.email).once('value');
         if (snap.val()) {
             await auth.signOut();
@@ -693,7 +1148,6 @@ async function googleRegisterAuth() {
 
         registerGoogleUser = user;
 
-        // Show badge & pre-fill email and name
         document.getElementById('regGoogleBadge').style.display = 'flex';
         document.getElementById('regGoogleEmail').textContent   = user.email;
         document.getElementById('r-email').value                = user.email;
@@ -729,7 +1183,7 @@ function regModalNext(fromStep) {
             err.style.display = 'block';
             return;
         }
-        document.getElementById('modalTitle').textContent    = 'Vehicle & ID Details';
+        document.getElementById('modalTitle').textContent    = 'Vehicle & Documents';
         document.getElementById('modalSubtitle').textContent = 'Almost done!';
         goToRegStep(2);
     }
@@ -742,6 +1196,57 @@ function regModalBack(fromStep) {
         document.getElementById('modalSubtitle').textContent = 'Tell us about yourself';
         goToRegStep(1);
     }
+}
+
+/* ── Cloudinary upload ── */
+function triggerUpload(type) {
+    document.getElementById('fileInput-' + type).click();
+}
+
+async function handleUpload(type, input) {
+    if (!input.files || !input.files[0]) return;
+    const file  = input.files[0];
+    const box   = document.getElementById('uploadBox-' + type);
+    const status = document.getElementById('uploadStatus-' + type);
+
+    box.classList.add('uploading');
+    status.textContent = 'Uploading…';
+    status.style.color = 'var(--accent)';
+
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        formData.append('folder', '1busket_drivers');
+
+        const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.secure_url) {
+            uploadedDocs[type] = data.secure_url;
+            box.classList.remove('uploading');
+            box.classList.add('has-file');
+            status.textContent = file.name.length > 18 ? file.name.slice(0, 16) + '…' : file.name;
+            status.style.color = 'var(--green)';
+        } else {
+            throw new Error('Upload failed');
+        }
+    } catch (e) {
+        box.classList.remove('uploading');
+        status.textContent = 'Upload failed — retry';
+        status.style.color = 'var(--danger)';
+        input.value = '';
+    }
+}
+
+/* ── Generate preview Driver ID ── */
+function generatePreviewDriverId(name) {
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `DRV-${initials}${rand}`;
 }
 
 /* ── Final submit ── */
@@ -771,7 +1276,8 @@ async function submitRegistration() {
     btn.disabled = true;
     btn.innerHTML = '<span style="opacity:.65;">Submitting…</span>';
 
-    const fullName = document.getElementById('r-name').value.trim();
+    const fullName      = document.getElementById('r-name').value.trim();
+    const previewDrvId  = generatePreviewDriverId(fullName);
 
     const payload = {
         name:             fullName,
@@ -787,18 +1293,28 @@ async function submitRegistration() {
         idNumber:         idNumber,
         emergencyContact: emergency,
         bankDetails:      bank,
+        documents: {
+            vehiclePhoto:     uploadedDocs.vehicle   || null,
+            driversLicense:   uploadedDocs.dlicense  || null,
+            idPassport:       uploadedDocs.idbook    || null,
+            proofOfOwnership: uploadedDocs.ownership || null,
+        },
+        previewDriverID:  previewDrvId,
         status:           'pending',
         createdAt:        Date.now()
     };
 
     try {
-        await db.ref('drivers').push(payload);
-        await auth.signOut();  // sign out — they are not yet an active driver
+        const ref = await db.ref('drivers').push(payload);
+        pendingApplicationKey = ref.key;
+        await auth.signOut();
 
-        document.getElementById('regStepTrack').style.display   = 'none';
-        document.getElementById('regGoogleBadge').style.display = 'none';
-        document.getElementById('modalTitle').textContent        = 'Application Received!';
-        document.getElementById('modalSubtitle').textContent     = 'Pending admin approval';
+        document.getElementById('pendingDriverIdPreview').textContent = previewDrvId;
+        document.getElementById('regStepTrack').style.display         = 'none';
+        document.getElementById('regProgressWrap').style.display      = 'none';
+        document.getElementById('regGoogleBadge').style.display       = 'none';
+        document.getElementById('modalTitle').textContent              = 'Application Received!';
+        document.getElementById('modalSubtitle').textContent           = 'Pending admin approval';
         goToRegStep(3, false);
 
     } catch (e) {
@@ -806,6 +1322,101 @@ async function submitRegistration() {
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit Application';
+    }
+}
+
+
+/* ═══════════════════════════════════════════════
+   SUCCESS SCREEN ACTIONS
+   ═══════════════════════════════════════════════ */
+function shareOnWhatsApp() {
+    const name    = document.getElementById('r-name').value.trim() || 'I';
+    const preview = document.getElementById('pendingDriverIdPreview').textContent;
+    const msg     = encodeURIComponent(`🛵 ${name} just joined the 1BUSKET driver network! My pending Driver ID is ${preview}. Excited to start delivering! Join me at https://1busket.co.za`);
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+async function requestPushPermission() {
+    const btn = document.getElementById('notifBtn');
+    if (!('Notification' in window)) {
+        btn.textContent = 'Notifications not supported';
+        return;
+    }
+    if (Notification.permission === 'granted') {
+        btn.className = 'btn-notif granted';
+        btn.innerHTML = '✓ Notifications enabled!';
+        return;
+    }
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            btn.className = 'btn-notif granted';
+            btn.innerHTML = '✓ Notifications enabled!';
+            new Notification('1BUSKET Driver Portal', {
+                body: "You'll be notified as soon as your account is approved! 🎉",
+                icon: 'https://i.postimg.cc/65pML87d/1BUSKET-LOGO.png'
+            });
+        } else {
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Permission denied — enable in browser settings';
+        }
+    } catch(e) {
+        console.warn('Notification error:', e);
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   APPLICATION TRACKER MODAL
+   ═══════════════════════════════════════════════ */
+function openTrackerModal() {
+    // Optionally refresh status from Firebase
+    if (pendingApplicationKey) {
+        db.ref('drivers/' + pendingApplicationKey).once('value').then(snap => {
+            if (snap.val()) updateTrackerUI(snap.val());
+        }).catch(() => {});
+    }
+
+    const overlay = document.getElementById('trackerModal');
+    overlay.classList.add('open');
+    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
+}
+
+function closeTrackerModal() {
+    const overlay = document.getElementById('trackerModal');
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.classList.remove('open'), 320);
+}
+
+document.getElementById('trackerModal').addEventListener('click', function(e) {
+    if (e.target === this) closeTrackerModal();
+});
+
+function updateTrackerUI(driverData) {
+    const status = driverData.status;
+    const dot2   = document.getElementById('trackerDot2');
+    const dot3   = document.getElementById('trackerDot3');
+    const dot4   = document.getElementById('trackerDot4');
+    const badge  = document.getElementById('trackerBadge');
+    const sub    = document.getElementById('trackerSubtitle');
+
+    if (status === 'active') {
+        dot2.className   = 'tracker-dot done'; dot2.textContent = '✓';
+        dot3.className   = 'tracker-dot done'; dot3.textContent = '✓';
+        dot4.className   = 'tracker-dot done'; dot4.textContent = '✓';
+        badge.className  = 'tracker-badge active'; badge.textContent = 'Active';
+        sub.textContent  = 'Your account is live!';
+    } else if (status === 'approved') {
+        dot2.className   = 'tracker-dot done'; dot2.textContent = '✓';
+        dot3.className   = 'tracker-dot done'; dot3.textContent = '✓';
+        dot4.className   = 'tracker-dot active'; dot4.textContent = '⋯';
+        badge.className  = 'tracker-badge active'; badge.textContent = 'Approved';
+        sub.textContent  = 'Approved — activating…';
+    } else {
+        // pending (default)
+        dot2.className   = 'tracker-dot active'; dot2.textContent = '⋯';
+        dot3.className   = 'tracker-dot pending'; dot3.textContent = '3';
+        dot4.className   = 'tracker-dot pending'; dot4.textContent = '4';
+        badge.className  = 'tracker-badge pending'; badge.textContent = 'Pending';
+        sub.textContent  = 'Tracking your application';
     }
 }
 </script>
