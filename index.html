@@ -1,1476 +1,1422 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>1BUSKET | Driver Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — Mokopane FM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-:root{
-  --accent:#ff751f;--accent-dark:#e0621a;--accent-light:#fff3eb;--accent-muted:#ffd9bc;--accent-rgb:255,117,31;
-  --store-gradient:linear-gradient(135deg,#ff751f,#e0621a);
-  --bg:#fafaf8;--surface:#ffffff;--surface2:#f5f4f1;
-  --border:#e8e6e1;--border-strong:#d1cec7;
-  --text:#1c1a17;--dim:#6b6560;--text-muted:#a09a92;
-  --danger:#d93025;--warning:#ff9500;--green:#1a7a4a;--blue:#1a56a0;
-  --sidebar-width:280px;--sidebar-collapsed:72px;
-  --radius:16px;--radius-sm:10px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow:0 4px 16px rgba(0,0,0,.06),0 2px 6px rgba(0,0,0,.04);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.05);
-  --shadow-hover:0 8px 28px rgba(0,0,0,.10);
-  --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
-  --spring:0.4s cubic-bezier(0.34,1.56,0.64,1);
-  --mobile-nav-h:64px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-input[type="text"],input[type="email"],input[type="tel"],input[type="number"],input[type="password"],input[type="url"],input[type="time"],input[type="file"],select{border-radius:999px!important}
-textarea{border-radius:20px!important}
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* OFFLINE BANNER */
-#offlineBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1c1a17,#2d2a24);color:white;padding:10px 20px;text-align:center;font-size:.82rem;font-weight:700;align-items:center;justify-content:center;gap:10px}
-#offlineBanner.show{display:flex}
-.offline-dot{width:8px;height:8px;border-radius:50%;background:#ff4444;animation:pulse-dot 1s infinite}
+  :root {
+    --gold: #F5A800;
+    --gold-lt: #FFC935;
+    --gold-dk: #D48900;
+    --maroon: #7A1515;
+    --maroon-dk: #4E0D0D;
+    --black: #0A0A0A;
+    --bg: #111111;
+    --panel: #1A1A1A;
+    --panel2: #1F1F1F;
+    --card: #222222;
+    --line: rgba(245,168,0,0.14);
+    --line-soft: rgba(255,255,255,0.08);
+    --text: #FFFFFF;
+    --muted: #9A9A9A;
+    --danger: #E2483C;
+    --danger-dk: #B5352B;
+    --success: #4CAF6D;
+  }
 
-/* BUSY MODE BANNER */
-#busyBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(135deg,#ff9500,#e0821a);color:white;padding:10px 20px;font-size:.82rem;font-weight:700;align-items:center;justify-content:space-between;gap:10px}
-#busyBanner.show{display:flex}
-#busyBanner.offline-offset{top:40px}
-.busy-banner-left{display:flex;align-items:center;gap:8px}
-.busy-go-online-btn{background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.4);color:white;padding:5px 14px;border-radius:999px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;transition:background .2s}
-.busy-go-online-btn:hover{background:rgba(255,255,255,.4)}
+  html { scroll-behavior: smooth; }
 
-/* SHIMMER */
-#shimmerOverlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;transition:opacity .55s ease}
-#shimmerOverlay.active{display:flex}#shimmerOverlay.fade-out{opacity:0;pointer-events:none}
-.shim-sidebar{position:absolute;left:0;top:0;width:var(--sidebar-collapsed);height:100%;background:white;border-right:1px solid var(--border);padding:24px 12px;display:flex;flex-direction:column;gap:18px}
-.shim-main{margin-left:var(--sidebar-collapsed);flex:1;padding:40px;display:flex;flex-direction:column;gap:28px}
-.shim-block{border-radius:20px;background:linear-gradient(90deg,#e8eaed 25%,#f4f5f7 50%,#e8eaed 75%);background-size:400% 100%;animation:shimmerSlide 1.5s ease-in-out infinite}
-@keyframes shimmerSlide{0%{background-position:100% 0}100%{background-position:-100% 0}}
-.shim-header{height:44px;width:260px;border-radius:999px}.shim-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.shim-stat{height:110px;border-radius:20px}.shim-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}.shim-card{height:200px;border-radius:20px}
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-/* DESKTOP SIDEBAR */
-.sidebar{width:var(--sidebar-collapsed);background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;position:fixed;height:100vh;z-index:100;display:flex;flex-direction:column;transition:width 0.35s cubic-bezier(0.4,0,0.2,1);overflow:hidden}
-.sidebar.expanded{width:var(--sidebar-width);padding:30px 20px}
-.logo-wrap{margin-bottom:36px;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden}
-.logo-img{height:32px;width:auto;object-fit:contain;flex-shrink:0}
-.logo-text{font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-0.5px;opacity:0;transform:translateX(-10px);transition:opacity 0.25s ease,transform 0.25s ease;white-space:nowrap}
-.sidebar.expanded .logo-text{opacity:1;transform:translateX(0)}
-.nav-section{margin-bottom:24px}
-.nav-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:10px;padding-left:12px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.2s ease}
-.sidebar.expanded .nav-label{opacity:1}
-.nav-item{padding:13px 12px;margin-bottom:4px;border-radius:14px;cursor:pointer;transition:var(--transition);font-weight:600;display:flex;align-items:center;gap:12px;color:var(--dim);white-space:nowrap;position:relative}
-.nav-item:hover{background:var(--surface2);color:var(--text)}
-.nav-item.active{background:var(--accent);color:white}
-.nav-icon{flex-shrink:0;width:20px;height:20px}
-.nav-text{opacity:0;transform:translateX(-8px);transition:opacity 0.2s ease,transform 0.2s ease}
-.sidebar.expanded .nav-text{opacity:1;transform:translateX(0)}
-.nav-badge{background:var(--danger);color:white;font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:999px;min-width:18px;text-align:center}
-.logout-btn{padding:13px 12px;margin-top:8px;border-radius:14px;cursor:pointer;transition:var(--transition);font-weight:600;display:flex;align-items:center;gap:12px;color:var(--danger);white-space:nowrap;border:none;background:transparent;font-family:inherit;font-size:inherit;width:100%}
-.logout-btn:hover{background:#fff1f0}
-.user-profile{padding:10px;background:var(--bg);border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);border:1px solid transparent;overflow:hidden;white-space:nowrap}
-.user-profile:hover{border-color:var(--border)}
-.user-avatar{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:var(--store-gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem}
-.user-info{opacity:0;transform:translateX(-8px);transition:opacity 0.2s ease,transform 0.2s ease}
-.sidebar.expanded .user-info{opacity:1;transform:translateX(0)}
-.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:pulse-dot 2s infinite}
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dk); border-radius: 4px; }
 
-/* BUSY STATUS DOT */
-.busy-dot{width:8px;height:8px;border-radius:50%;background:#ff9500;display:inline-block;margin-right:4px;animation:pulse-dot 1s infinite}
+  /* ═══════ LOGIN SCREEN ═══════ */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(245,168,0,0.10), transparent),
+      var(--black);
+  }
 
-/* MAIN PANEL */
-.main-panel{margin-left:var(--sidebar-collapsed);flex:1;padding:36px;max-width:calc(100% - var(--sidebar-collapsed));transition:margin-left 0.35s cubic-bezier(0.4,0,0.2,1),max-width 0.35s cubic-bezier(0.4,0,0.2,1)}
-.main-panel.shifted{margin-left:var(--sidebar-width);max-width:calc(100% - var(--sidebar-width))}
-.page-content{display:none;animation:fadeInUp 0.35s ease-out}
-.page-content.active{display:block}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 40px 36px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  }
 
-/* HERO */
-.dashboard-hero{border-radius:24px;padding:28px 32px;margin-bottom:28px;background:var(--store-gradient);position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(255,117,31,.3)}
-.dashboard-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
-.dashboard-hero::after{content:'';position:absolute;bottom:-40px;right:80px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05)}
-.hero-inner{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
-.hero-left h1{font-size:1.7rem;font-weight:800;color:white;letter-spacing:-0.5px;margin-bottom:4px}
-.hero-left p{color:rgba(255,255,255,.75);font-size:.88rem;font-weight:500}
-.hero-emoji{font-size:3.5rem;line-height:1}
+  .login-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
 
-/* STAT CARDS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:28px}
-.stat-card{background:white;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);transition:var(--transition);position:relative;overflow:hidden}
-.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
-.stat-card::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:var(--store-gradient);opacity:0;transition:opacity 0.3s}
-.stat-card:hover::after{opacity:1}
-.stat-icon{position:absolute;right:16px;top:16px;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--accent-light)}
-.stat-icon i{width:18px;height:18px;color:var(--accent)}
-.stat-card h3{font-size:.7rem;text-transform:uppercase;color:var(--dim);letter-spacing:.5px;margin-bottom:8px;font-weight:700}
-.stat-card p{font-size:2rem;font-weight:800;color:var(--text)}
+  .login-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    letter-spacing: 0.03em;
+    line-height: 1.05;
+    margin-bottom: 28px;
+  }
 
-/* CONTENT CARDS */
-.content-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden}
-.card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.card-header h2{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px}
-.order-card{padding:18px 22px;border-bottom:1px solid var(--border);transition:var(--transition)}
-.order-card:hover{background:var(--accent-light)}
-.order-card:last-child{border-bottom:none}
-.order-meta-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:700}
-.pill-blue{background:var(--accent-light);color:var(--accent-dark)}
-.pill-green{background:#edf9f2;color:#1a7a4a}
-.pill-yellow{background:#fef9c3;color:#a16207}
-.pill-red{background:#fff1f0;color:#d93025}
-.pill-gray{background:var(--surface2);color:var(--dim)}
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.02em;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: #262626;
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
 
-/* BUTTONS */
-.btn-primary{background:var(--accent);color:white;border:none;padding:11px 20px;border-radius:999px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:var(--transition);box-shadow:0 4px 14px rgba(255,117,31,.35);font-family:inherit;font-size:.88rem}
-.btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 8px 22px rgba(255,117,31,.45)}
-.btn{padding:7px 14px;border-radius:999px;border:none;cursor:pointer;font-weight:600;transition:var(--transition);font-size:.8rem;display:inline-flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap}
-.btn-edit{background:var(--surface2);color:var(--text)}.btn-edit:hover{background:var(--border);transform:translateY(-1px)}
-.btn-danger{background:#fff1f0;color:var(--danger)}.btn-danger:hover{background:var(--danger);color:white;transform:translateY(-1px)}
-.btn-success{background:#edf9f2;color:var(--green)}.btn-success:hover{background:var(--green);color:white;transform:translateY(-1px)}
-.btn-warning{background:#fef9c3;color:#a16207}.btn-warning:hover{background:#ff9500;color:white;transform:translateY(-1px)}
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* MODALS */
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);backdrop-filter:blur(12px);z-index:2000;justify-content:center;align-items:center;opacity:0;transition:opacity .3s ease}
-.modal-overlay.active{opacity:1}
-.modal-content{background:white;padding:30px;border-radius:24px;width:560px;max-width:95vw;box-shadow:0 32px 64px rgba(0,0,0,.18);transform:scale(0.9) translateY(20px);transition:transform 0.35s cubic-bezier(0.34,1.56,.64,1);max-height:90vh;overflow-y:auto}
-.modal-overlay.active .modal-content{transform:scale(1) translateY(0)}
-.modal-btn-row{display:flex;gap:12px;margin-top:22px}
-.modal-handle{width:40px;height:4px;border-radius:999px;background:var(--border);margin:0 auto 16px;display:none}
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold-lt), var(--gold-dk));
+    color: var(--black);
+  }
+  .btn-gold:hover:not(:disabled) { box-shadow: 0 6px 22px rgba(245,168,0,0.35); }
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:15px 22px;border-radius:999px;box-shadow:var(--shadow-hover);display:flex;align-items:center;gap:12px;transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);z-index:3000;font-size:.9rem;font-weight:600;max-width:360px}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.success{border-left:4px solid var(--green)}.toast.error{border-left:4px solid var(--danger)}
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--line-soft);
+    color: var(--text);
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 
-/* PROFILE */
-.profile-container{max-width:700px}
-.profile-hero-card{background:var(--store-gradient);border-radius:24px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(255,117,31,.3)}
-.profile-hero-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)}
-.profile-hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:20px}
-.profile-avatar-large{width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.8rem;border:2px solid rgba(255,255,255,.3);flex-shrink:0}
-.profile-hero-info h2{color:white;font-size:1.3rem;font-weight:800;margin-bottom:4px}
-.profile-hero-info p{color:rgba(255,255,255,.7);font-size:.84rem}
-.profile-status-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 14px;color:white;font-size:.76rem;font-weight:700;margin-top:8px}
-.profile-section-card{background:white;border-radius:20px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
-.profile-section-title{font-size:.72rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;padding:16px 20px 0}
-.profile-field-row{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border)}
-.profile-field-row:last-child{border-bottom:none}
-.profile-field-label{font-size:.78rem;color:var(--dim);font-weight:600;margin-bottom:3px}
-.profile-pill-input{flex:1;padding:10px 16px;border:1.5px solid var(--border);border-radius:999px;font-family:inherit;font-size:.88rem;outline:none;transition:var(--transition);background:var(--bg);color:var(--text);max-width:280px}
-.profile-pill-input:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(255,117,31,.12)}
-.profile-pill-input[readonly]{background:var(--accent-light);color:var(--accent-dark);border-color:transparent;cursor:default}
+  .btn-danger {
+    background: rgba(226,72,60,0.12);
+    border: 1px solid rgba(226,72,60,0.4);
+    color: #FF8079;
+  }
+  .btn-danger:hover:not(:disabled) { background: var(--danger); color: white; border-color: var(--danger); }
 
-/* SETTINGS */
-.settings-container{max-width:700px}
-.settings-card{background:white;border-radius:20px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
-.settings-card-title{font-size:.72rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;padding:16px 20px 0}
-.settings-row{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);transition:var(--transition)}
-.settings-row:last-child{border-bottom:none}
-.settings-row:hover{background:var(--surface2)}
-.settings-label{font-size:.88rem;font-weight:600;color:var(--text)}
-.settings-sub{font-size:.75rem;color:var(--dim);margin-top:2px}
-.toggle{width:46px;height:26px;border-radius:999px;background:var(--border);position:relative;cursor:pointer;transition:var(--transition);flex-shrink:0}
-.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:var(--transition)}
-.toggle.on{background:var(--accent)}.toggle.on::after{transform:translateX(20px)}
-.toggle.busy-color.on{background:#ff9500}
+  .btn-block { width: 100%; }
+  .btn-sm { padding: 8px 14px; font-size: 12px; }
+  .btn-icon { padding: 9px; }
 
-/* BUSY MODE SELECTOR */
-.busy-reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
-.busy-reason-btn{padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:var(--transition);font-family:inherit}
-.busy-reason-btn:hover{border-color:var(--warning);background:#fef9c3}
-.busy-reason-btn.selected{border-color:var(--warning);background:#fef9c3;box-shadow:0 0 0 3px rgba(255,149,0,.15)}
-.busy-reason-btn .reason-icon{font-size:1.6rem;margin-bottom:6px}
-.busy-reason-btn .reason-label{font-size:.82rem;font-weight:700;color:var(--text)}
+  .login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .login-divider::before, .login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .login-divider::before { margin-right: 12px; }
+  .login-divider::after { margin-left: 12px; }
 
-/* MAP */
-.map-container{width:100%;height:280px;border-radius:16px;overflow:hidden;margin-top:12px;border:1px solid var(--border)}
-#orderMap{width:100%;height:100%}
-.order-detail-section{margin-bottom:18px}
-.order-detail-section h4{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin-bottom:10px}
-.addr-display{background:var(--accent-light);border:1px solid rgba(255,117,31,.2);border-radius:14px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px}
-.addr-display.pickup{background:#edf9f2;border:1px solid #bbf0d3}
-.addr-display.delivery{background:var(--accent-light);border:1px solid rgba(255,117,31,.2)}
-.addr-display.locked{background:#fef9c3;border:1px solid #fcd34d}
+  .login-error {
+    background: rgba(226,72,60,0.12);
+    border: 1px solid rgba(226,72,60,0.35);
+    color: #FF8079;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
 
-/* ROUTE OPTIMIZATION CARD */
-.route-card{background:linear-gradient(135deg,#1c1a17,#2d2a24);border-radius:20px;padding:20px;margin-bottom:20px;color:white;position:relative;overflow:hidden}
-.route-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,117,31,.15)}
-.route-card-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.6);margin-bottom:10px}
-.route-card h3{font-size:1.05rem;font-weight:800;margin-bottom:16px}
-.route-stops{display:flex;flex-direction:column;gap:0}
-.route-stop{display:flex;align-items:flex-start;gap:12px;padding:8px 0;position:relative}
-.route-stop:not(:last-child)::after{content:'';position:absolute;left:13px;top:28px;width:2px;height:calc(100% - 10px);background:rgba(255,255,255,.2)}
-.route-stop-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0;z-index:1}
-.route-stop-num.pickup{background:#1a7a4a;color:white}
-.route-stop-num.delivery{background:var(--accent);color:white}
-.route-stop-info{flex:1}
-.route-stop-type{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.6;margin-bottom:2px}
-.route-stop-addr{font-size:.82rem;font-weight:600;line-height:1.4}
-.route-map-wrap{height:200px;border-radius:14px;overflow:hidden;margin-top:14px;border:1px solid rgba(255,255,255,.1)}
-#routeOptMap{width:100%;height:100%}
+  /* ═══════ APP SHELL ═══════ */
+  #appShell { display: none; min-height: 100vh; }
 
-/* PHOTO PROOF */
-.proof-upload-area{border:2.5px dashed var(--border);border-radius:20px;padding:32px;text-align:center;cursor:pointer;transition:var(--transition);background:var(--surface2);position:relative;margin:16px 0}
-.proof-upload-area:hover{border-color:var(--accent);background:var(--accent-light)}
-.proof-upload-area.has-photo{border-color:var(--green);background:#edf9f2;border-style:solid}
-.proof-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.proof-preview{width:100%;height:180px;object-fit:cover;border-radius:14px;display:none;margin-bottom:12px}
-.proof-preview.show{display:block}
-.proof-upload-icon{font-size:2.4rem;margin-bottom:8px}
-.proof-upload-label{font-size:.9rem;font-weight:700;color:var(--dim);margin-bottom:4px}
-.proof-upload-sub{font-size:.75rem;color:var(--text-muted)}
-.proof-uploading{display:none;align-items:center;gap:10px;justify-content:center;padding:12px 0;color:var(--accent);font-weight:600;font-size:.85rem}
-.proof-uploading.show{display:flex}
+  header.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(17,17,17,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
 
-/* LEADERBOARD */
-.leaderboard-container{max-width:700px}
-.leaderboard-header-card{background:linear-gradient(135deg,#1c1a17 0%,#3d3630 100%);border-radius:24px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden}
-.leaderboard-header-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,117,31,.12)}
-.leaderboard-header-card h2{color:white;font-size:1.4rem;font-weight:800;margin-bottom:4px;position:relative}
-.leaderboard-header-card p{color:rgba(255,255,255,.6);font-size:.84rem;position:relative}
-.leaderboard-province-filter{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.province-chip{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:.78rem;font-weight:700;color:var(--dim);transition:var(--transition);font-family:inherit}
-.province-chip:hover{border-color:var(--accent-muted);color:var(--accent)}
-.province-chip.active{background:var(--accent);border-color:var(--accent);color:white}
-.leaderboard-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:16px;margin-bottom:8px;background:white;border:1px solid var(--border);transition:var(--transition)}
-.leaderboard-row:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
-.leaderboard-row.is-me{background:var(--accent-light);border-color:var(--accent-muted);box-shadow:0 0 0 2px rgba(255,117,31,.15)}
-.leaderboard-row.rank-1{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d}
-.leaderboard-row.rank-2{background:linear-gradient(135deg,#f9fafb,#f1f5f9);border-color:#cbd5e1}
-.leaderboard-row.rank-3{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa}
-.leaderboard-rank{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
-.rank-1 .leaderboard-rank{background:linear-gradient(135deg,#f59e0b,#d97706);color:white}
-.rank-2 .leaderboard-rank{background:linear-gradient(135deg,#94a3b8,#64748b);color:white}
-.rank-3 .leaderboard-rank{background:linear-gradient(135deg,#fb923c,#ea580c);color:white}
-.leaderboard-rank-default{background:var(--surface2);color:var(--dim)}
-.leaderboard-avatar{width:40px;height:40px;border-radius:12px;background:var(--store-gradient);color:white;font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.leaderboard-info{flex:1;min-width:0}
-.leaderboard-name{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.leaderboard-sub{font-size:.72rem;color:var(--dim)}
-.leaderboard-score{text-align:right;flex-shrink:0}
-.leaderboard-deliveries{font-size:1.1rem;font-weight:800;color:var(--text)}
-.leaderboard-earn{font-size:.72rem;color:var(--green);font-weight:700}
-.you-badge{background:var(--accent);color:white;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:6px}
-.leaderboard-trophy{font-size:1.4rem}
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--maroon), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .brand-text-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.03em; line-height: 1; }
+  .brand-text-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
 
-/* MISC */
-.empty-state{text-align:center;padding:48px 24px;color:var(--dim)}
-.history-card{background:white;border-radius:16px;padding:16px 20px;border:1px solid var(--border);margin-bottom:12px;transition:var(--transition)}
-.history-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
-.customer-name-badge{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border-radius:999px;padding:3px 12px;font-size:.7rem;font-weight:600;color:var(--accent);margin-left:8px}
-.location-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fcd34d;border-radius:16px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;font-size:.84rem;font-weight:600;color:#92400e}
-.location-banner.success{background:linear-gradient(135deg,#edf9f2,#bbf0d3);border-color:#86efac;color:#14532d}
-.location-banner.error{background:linear-gradient(135deg,#fff1f0,#fcd9d7);border-color:#fca5a5;color:#7f1d1d}
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .save-indicator {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .save-indicator .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(76,175,109,0.6);
+  }
+  .save-indicator.saving .dot { background: var(--gold); animation: pulse 0.9s infinite; }
+  .save-indicator.error .dot { background: var(--danger); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-/* ══════════════════════════
-   MOBILE STYLES
-══════════════════════════ */
-@media(min-width:769px){
-  .mobile-topbar,.mobile-bottom-nav{display:none!important}
-  .hero-stats-row{display:none!important}
-  .mob-only{display:none!important}
-  .dash-two-col{display:grid;grid-template-columns:1fr 340px;gap:20px}
-}
-@media(max-width:768px){
-  .sidebar{display:none!important}.shim-sidebar{display:none!important}
-  .shim-main{margin-left:0!important;padding:20px 16px!important}
-  .main-panel{margin-left:0!important;max-width:100%!important;padding:calc(60px + 14px) 0 calc(var(--mobile-nav-h) + var(--safe-bottom) + 14px)!important;display:block!important}
-  .main-panel.shifted{margin-left:0!important;max-width:100%!important}
-  .mobile-topbar{display:flex!important;align-items:center;justify-content:space-between;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;z-index:200;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-  .mob-logo-img{height:28px;width:auto;object-fit:contain}
-  .mob-topbar-right{display:flex;align-items:center;gap:10px}
-  .mob-loc{font-size:11px;color:var(--dim);font-weight:600;display:flex;align-items:center;gap:4px}
-  .mob-avatar{width:36px;height:36px;border-radius:10px;background:var(--store-gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .2s}
-  .mob-avatar:active{transform:scale(.92)}
-  .mobile-bottom-nav{display:flex!important;position:fixed;bottom:0;left:0;right:0;height:calc(var(--mobile-nav-h) + var(--safe-bottom));background:var(--surface);border-top:1px solid var(--border);z-index:200;align-items:flex-start;padding-top:6px;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
-  .mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 4px;border:none;background:transparent;cursor:pointer;color:var(--text-muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;transition:color .25s;position:relative}
-  .mob-nav-btn.active{color:var(--accent)}
-  .mob-nav-btn svg{width:22px;height:22px;stroke:currentColor;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
-  .mob-nav-btn.active svg{transform:translateY(-2px)}
-  .mob-nav-btn::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%) scaleX(0);width:26px;height:3px;background:var(--accent);border-radius:0 0 3px 3px;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
-  .mob-nav-btn.active::before{transform:translateX(-50%) scaleX(1)}
-  .mob-nav-badge{position:absolute;top:2px;right:calc(50% - 20px);background:var(--danger);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;border:2px solid var(--surface);transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
-  .mob-nav-badge.visible{transform:scale(1)}
-  .dashboard-hero{border-radius:18px;padding:18px;margin:0 0 14px}
-  .hero-left h1{font-size:1.15rem}.hero-left p{font-size:.76rem}.hero-emoji{font-size:2.4rem}
-  .hero-stats-row{display:flex!important;gap:8px;margin-top:14px;position:relative;z-index:2}
-  .hero-stat-pill{flex:1;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:9px 6px;text-align:center}
-  .hero-stat-pill .val{font-size:17px;font-weight:800;color:#fff}
-  .hero-stat-pill .lbl{font-size:9px;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:2px}
-  .mob-pg{padding:0 14px}
-  .mob-section-lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px;margin:18px 0 10px}
-  .mob-count-chip{background:var(--accent);color:white;font-size:9.5px;padding:2px 7px;border-radius:999px;font-weight:700}
-  .mob-order-list{display:flex;flex-direction:column;gap:10px}
-  .mob-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;animation:mobCardIn .35s cubic-bezier(.34,1.2,.64,1) both;transition:transform .18s,box-shadow .18s}
-  .mob-card:active{transform:scale(.985);box-shadow:none}
-  @keyframes mobCardIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-  .mob-card-head{padding:13px 14px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  .mob-vendor-name{font-size:14.5px;font-weight:800;color:var(--text)}
-  .mob-order-num{font-size:11px;color:var(--text-muted);font-weight:600;margin-top:1px}
-  .mob-order-amount{font-size:18px;font-weight:800;color:var(--accent);white-space:nowrap}
-  .mob-addr-row{margin:0 14px 11px;padding:10px 12px;border-radius:12px;display:flex;gap:9px;align-items:flex-start}
-  .mob-addr-row.pickup{background:#edf9f2;border:1px solid rgba(26,122,74,.18)}
-  .mob-addr-row.delivery{background:var(--accent-light);border:1px solid rgba(255,117,31,.18)}
-  .mob-addr-row.locked{background:#fef9c3;border:1px solid rgba(252,211,77,.6)}
-  .mob-addr-row svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
-  .mob-addr-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-  .mob-addr-row.pickup .mob-addr-lbl{color:var(--green)}.mob-addr-row.delivery .mob-addr-lbl{color:var(--accent-dark)}.mob-addr-row.locked .mob-addr-lbl{color:#92400e}
-  .mob-addr-val{font-size:12px;font-weight:600;line-height:1.4}
-  .mob-addr-row.pickup .mob-addr-val{color:#065F46}.mob-addr-row.delivery .mob-addr-val{color:#7C2D12}.mob-addr-row.locked .mob-addr-val{color:#92400e;font-size:11.5px}
-  .mob-card-foot{padding:8px 14px 13px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-  .mob-meta-row{display:flex;gap:6px;flex:1;flex-wrap:wrap;align-items:center}
-  .mob-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:600;color:var(--dim)}
-  .mob-chip svg{width:10px;height:10px}
-  .mob-btn-row{display:flex;gap:7px;flex-shrink:0}
-  .mob-btn{display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border-radius:999px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:transform .2s;white-space:nowrap}
-  .mob-btn:active{transform:scale(.91)}.mob-btn svg{width:13px;height:13px}
-  .mob-btn-accept{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(26,122,74,.3)}
-  .mob-btn-reveal{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(255,117,31,.3)}
-  .mob-btn-done{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(255,117,31,.3)}
-  .mob-btn-outline{background:var(--surface2);color:var(--text);border:1px solid var(--border-strong)}
-  .mob-btn-del{background:#fff1f0;color:var(--danger)}
-  .mob-btn-proof{background:linear-gradient(135deg,#1a56a0,#1a3a7a);color:#fff;box-shadow:0 3px 10px rgba(26,86,160,.3)}
-  .mob-status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
-  .mob-status-pill.assigned{background:#fef9c3;color:#a16207}
-  .mob-status-pill.out_for_delivery{background:var(--accent-light);color:var(--accent-dark)}
-  .desk-only{display:none!important}.mob-only{display:block!important}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-  .stat-card{padding:14px;border-radius:14px}.stat-card p{font-size:1.5rem}.stat-card h3{font-size:.62rem}
-  .stat-icon{width:30px;height:30px;border-radius:8px;right:10px;top:10px}.stat-icon i{width:14px;height:14px}
-  .profile-container{max-width:100%}.profile-hero-card{padding:22px;border-radius:18px;margin-bottom:16px}
-  .profile-avatar-large{width:56px;height:56px;font-size:1.4rem}.profile-hero-info h2{font-size:1.1rem}
-  .profile-field-row{flex-direction:column;align-items:flex-start;gap:8px}.profile-pill-input{max-width:100%;width:100%}
-  .settings-container{max-width:100%}
-  .history-card{border-radius:14px;padding:13px 14px}
-  .modal-overlay{align-items:flex-end!important}
-  .modal-content{width:100%!important;max-width:100%!important;border-radius:24px 24px 0 0!important;padding:18px 18px calc(var(--safe-bottom) + 20px)!important;transform:translateY(100%)!important;max-height:92vh!important;transition:transform .4s cubic-bezier(.34,1.2,.64,1)!important}
-  .modal-overlay.active .modal-content{transform:translateY(0)!important}
-  .modal-handle{display:block!important}
-  .modal-btn-row{flex-direction:column!important}
-  .modal-btn-row .btn{justify-content:center!important;padding:13px!important;font-size:.88rem!important;border-radius:14px!important}
-  .toast{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 10px);right:12px;left:12px;max-width:100%;border-radius:14px}
-  .page-content>h1{font-size:1.4rem!important;margin-bottom:18px!important;padding:0 14px}
-  .map-container{height:200px}
-  .leaderboard-container{max-width:100%}
-  .busy-reason-grid{grid-template-columns:1fr 1fr}
-  .route-card{border-radius:16px;padding:16px}
-}
-@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite}
+  .user-chip {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 12px;
+    border: 1px solid var(--line-soft);
+    border-radius: 20px;
+  }
+
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 36px 32px 100px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 6px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.25s;
+  }
+  .tab-btn.active::after { transform: scaleX(1); }
+  .tab-btn .count {
+    font-size: 11px;
+    background: var(--card);
+    color: var(--muted);
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 7px;
+  }
+  .tab-btn.active .count { background: rgba(245,168,0,0.15); color: var(--gold); }
+
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .panel-head h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+  .panel-head p { color: var(--muted); font-size: 13.5px; max-width: 480px; line-height: 1.5; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 70px 30px;
+    border: 1px dashed var(--line-soft);
+    border-radius: 16px;
+    color: var(--muted);
+  }
+  .empty-state svg { margin-bottom: 14px; opacity: 0.4; }
+  .empty-state h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
+  .empty-state p { font-size: 13px; margin-bottom: 20px; }
+
+  /* ── SHOW CARDS LIST ── */
+  .item-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .show-row {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .show-row:hover { border-color: var(--line); }
+  .show-row.dragging { opacity: 0.4; }
+  .show-row.drag-over { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+
+  .drag-handle {
+    cursor: grab;
+    color: var(--muted);
+    padding: 8px 4px;
+    flex-shrink: 0;
+    align-self: center;
+    touch-action: none;
+  }
+  .drag-handle:active { cursor: grabbing; }
+
+  .show-preview {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+  }
+  .show-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .show-preview .grad-fill {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .show-preview .grad-fill .gi { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: rgba(255,255,255,0.5); }
+  .show-preview .grad-fill .gl { font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); text-align: center; padding: 0 4px; }
+
+  .show-fields { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .show-fields .field { margin-bottom: 0; }
+  .show-fields .field.full { grid-column: 1 / -1; }
+
+  .row-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line-soft);
+    border-radius: 9px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .mode-toggle button {
+    background: var(--card);
+    border: none;
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 8px 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mode-toggle button.active { background: var(--gold); color: var(--black); }
+
+  .upload-row { display: flex; align-items: center; gap: 10px; }
+  .upload-row .field { flex: 1; }
+
+  .gradient-row { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+  .swatch-input { display: flex; align-items: center; gap: 8px; }
+  .swatch-input input[type=color] {
+    width: 38px; height: 38px;
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    padding: 2px;
+    background: var(--card);
+    cursor: pointer;
+  }
+
+  .upload-progress {
+    height: 4px;
+    background: var(--card);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+    display: none;
+  }
+  .upload-progress.active { display: block; }
+  .upload-progress-bar { height: 100%; background: var(--gold); width: 0%; transition: width 0.2s; }
+
+  /* ── CAROUSEL GRID ── */
+  .carousel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  .slide-card {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .slide-card:hover { border-color: var(--line); }
+  .slide-card.dragging { opacity: 0.4; }
+  .slide-card.drag-over { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+
+  .slide-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .slide-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .slide-drag-handle {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(4px);
+    border-radius: 7px;
+    padding: 5px 7px;
+    cursor: grab;
+    color: white;
+    display: flex;
+    touch-action: none;
+  }
+  .slide-order-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(4px);
+    border-radius: 7px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .slide-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .slide-actions { display: flex; gap: 8px; }
+  .slide-actions .btn { flex: 1; }
+
+  .add-card-btn {
+    border: 1.5px dashed var(--line-soft);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 200px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .add-card-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(245,168,0,0.04); }
+
+  .add-show-row {
+    border: 1.5px dashed var(--line-soft);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    width: 100%;
+  }
+  .add-show-row:hover { border-color: var(--gold); color: var(--gold); background: rgba(245,168,0,0.04); }
+
+  /* ── Toast ── */
+  #toastWrap {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toast {
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-size: 13px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+    animation: toastIn 0.25s ease;
+  }
+  .toast.success { border-color: rgba(76,175,109,0.4); }
+  .toast.error { border-color: rgba(226,72,60,0.4); }
+  .toast .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+  .toast.error .dot { background: var(--danger); }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── confirm modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 380px;
+    width: 100%;
+  }
+  .modal-box h3 { font-size: 17px; margin-bottom: 10px; }
+  .modal-box p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin-bottom: 22px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .loading-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 13px;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--line-soft);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .helper-text { font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  @media (max-width: 760px) {
+    header.topbar { padding: 14px 18px; }
+    main { padding: 24px 16px 90px; }
+    .show-row { flex-wrap: wrap; }
+    .show-fields { grid-template-columns: 1fr; }
+    .show-preview { width: 100%; height: 140px; }
+    .row-actions { flex-direction: row; width: 100%; }
+    .row-actions .btn { flex: 1; }
+    .brand-text-sub { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<!-- OFFLINE BANNER -->
-<div id="offlineBanner">
-  <div class="offline-dot"></div>
-  <span>You're offline — orders will sync when back online</span>
-</div>
+<!-- ═══════════════════════════════════════ LOGIN ═══════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <p class="login-eyebrow">Mokopane FM · Admin</p>
+    <h2 class="login-title">Sign in to manage<br/>the lineup &amp; gallery</h2>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" autocomplete="username" required placeholder="you@mokopanefm.co.za" />
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-gold btn-block" id="loginBtn">Sign In</button>
+    </form>
 
-<!-- BUSY MODE BANNER -->
-<div id="busyBanner">
-  <div class="busy-banner-left">
-    <span style="font-size:1.1rem">⏸</span>
-    <span>Busy mode: <strong id="busyReasonLabel">On break</strong> — not receiving new orders</span>
-  </div>
-  <button class="busy-go-online-btn" onclick="goOnlineFromBanner()">Go Online</button>
-</div>
+    <div class="login-divider">or</div>
 
-<!-- SHIMMER -->
-<div id="shimmerOverlay">
-  <div class="shim-sidebar"></div>
-  <div class="shim-main">
-    <div class="shim-block shim-header"></div>
-    <div class="shim-stats"><div class="shim-block shim-stat"></div><div class="shim-block shim-stat"></div><div class="shim-block shim-stat"></div><div class="shim-block shim-stat"></div></div>
-    <div class="shim-row"><div class="shim-block shim-card"></div><div class="shim-block shim-card"></div></div>
-  </div>
-</div>
-
-<!-- MOBILE TOP BAR -->
-<div class="mobile-topbar" id="mobileTopbar" style="display:none">
-  <img src="https://i.postimg.cc/65pML87d/1BUSKET-LOGO.png" class="mob-logo-img" alt="1BUSKET">
-  <div class="mob-topbar-right">
-    <div class="mob-loc" id="mobLocStatus"><i data-lucide="map-pin"></i> Locating…</div>
-    <div class="mob-avatar" id="mobAvatar" onclick="mobileTab('profile','mnp')">D</div>
+    <button type="button" class="btn btn-ghost btn-block" id="googleLoginBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right:2px;">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.74 5.74 0 0 1-2.49 3.77v3.12h4.01c2.34-2.16 3.68-5.32 3.68-8.74z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-4.01-3.12c-1.12.75-2.55 1.19-3.92 1.19-3.02 0-5.57-2.04-6.48-4.78H1.31v3.22A12 12 0 0 0 12 24z"/>
+        <path fill="#FBBC05" d="M5.52 14.38A7.16 7.16 0 0 1 5.2 12c0-.82.14-1.61.32-2.38V6.4H1.31A12 12 0 0 0 0 12c0 2.11.55 4.1 1.51 5.84l4.01-3.46z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.69 1.31 6.41l4.21 3.22c.91-2.74 3.46-4.88 6.48-4.88z"/>
+      </svg>
+      Continue with Google
+    </button>
   </div>
 </div>
 
-<!-- DESKTOP SIDEBAR -->
-<nav class="sidebar" id="driverSidebar">
-  <div class="logo-wrap">
-    <img src="https://i.postimg.cc/65pML87d/1BUSKET-LOGO.png" alt="1BUSKET" class="logo-img">
-    <span class="logo-text">1BUSKET</span>
-  </div>
-  <div style="flex:1;overflow-y:auto">
-    <div class="nav-section">
-      <div class="nav-label">Main</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-text">Dashboard</span></div>
-      <div class="nav-item" onclick="showTab('available',this)"><i data-lucide="shopping-bag" class="nav-icon"></i><span class="nav-text">Available Orders</span><span class="nav-badge" id="availableBadge" style="display:none">0</span></div>
-      <div class="nav-item" onclick="showTab('deliveries',this)"><i data-lucide="map-pin" class="nav-icon"></i><span class="nav-text">My Deliveries</span></div>
-      <div class="nav-item" onclick="showTab('history',this)"><i data-lucide="clock" class="nav-icon"></i><span class="nav-text">Order History</span></div>
-      <div class="nav-item" onclick="showTab('earnings',this)"><i data-lucide="dollar-sign" class="nav-icon"></i><span class="nav-text">Earnings</span></div>
-      <div class="nav-item" onclick="showTab('leaderboard',this)"><i data-lucide="trophy" class="nav-icon"></i><span class="nav-text">Leaderboard</span></div>
+<!-- ═══════════════════════════════════════ APP SHELL ═══════════════════════════════════════ -->
+<div id="appShell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">FM</div>
+      <div>
+        <div class="brand-text-title">MOKOPANE FM</div>
+        <div class="brand-text-sub">Content Admin</div>
+      </div>
     </div>
-    <div class="nav-section">
-      <div class="nav-label">Account</div>
-      <div class="nav-item" onclick="showTab('profile',this)"><i data-lucide="user" class="nav-icon"></i><span class="nav-text">Profile</span></div>
-      <div class="nav-item" onclick="showTab('settings',this)"><i data-lucide="settings" class="nav-icon"></i><span class="nav-text">Settings</span></div>
-      <button class="logout-btn" onclick="openModal('logoutModal')"><i data-lucide="log-out" class="nav-icon"></i><span class="nav-text">Log Out</span></button>
+    <div class="topbar-right">
+      <div class="save-indicator" id="saveIndicator"><span class="dot"></span><span id="saveIndicatorText">Synced</span></div>
+      <span class="user-chip" id="userChip"></span>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Sign Out</button>
     </div>
-  </div>
-  <div class="user-profile" onclick="showTab('profile',null)">
-    <div class="user-avatar" id="driverAvatar">D</div>
-    <div class="user-info">
-      <div style="font-weight:700" id="driverSidebarName">Driver</div>
-      <div style="font-size:.72rem;color:var(--accent)" id="sidebarStatusLine"><span class="online-dot"></span>Online</div>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="shows">Daily Lineup <span class="count" id="showsCount">0</span></button>
+      <button class="tab-btn" data-tab="carousel">Photo Carousel <span class="count" id="carouselCount">0</span></button>
     </div>
-  </div>
-</nav>
 
-<!-- MAIN PANEL -->
-<main class="main-panel" id="driverMainPanel">
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="page-content active">
-    <div id="locationBanner" class="location-banner" style="display:none"></div>
-    <!-- Route optimization card (shown when 2+ active) -->
-    <div id="routeOptCard" style="display:none" class="mob-pg desk-padding">
-      <div class="route-card">
-        <div class="route-card-title">🗺 Route Optimisation</div>
-        <h3>Combined delivery route</h3>
-        <div class="route-stops" id="routeStopList"></div>
-        <div class="route-map-wrap"><div id="routeOptMap"></div></div>
-        <div style="margin-top:12px">
-          <button onclick="openGoogleMapsRoute()" class="btn-primary" style="width:100%;justify-content:center">
-            <i data-lucide="navigation" style="width:15px;height:15px"></i> Open Full Route in Google Maps
-          </button>
+    <!-- SHOWS TAB -->
+    <section class="tab-panel active" id="tab-shows">
+      <div class="panel-head">
+        <div>
+          <h1>Our Daily Lineup</h1>
+          <p>Edit every show card on the public site — name, time, host, and artwork. Drag the handle to reorder; the order here matches the order on the homepage.</p>
         </div>
       </div>
-    </div>
-    <div class="dashboard-hero">
-      <div class="hero-inner">
-        <div class="hero-left"><h1 id="dashHeroTitle">Ready to Ride? 🛵</h1><p id="dashHeroSub">Available deliveries near you</p></div>
-        <div class="hero-emoji">🛵</div>
+      <div class="item-list" id="showsList"></div>
+      <div style="margin-top:14px;">
+        <button class="add-show-row" id="addShowBtn">+ Add a new show card</button>
       </div>
-      <div class="hero-stats-row" id="heroStatsRow">
-        <div class="hero-stat-pill"><div class="val" id="hStatToday">0</div><div class="lbl">Today</div></div>
-        <div class="hero-stat-pill"><div class="val" id="hStatEarn">R0</div><div class="lbl">Earned</div></div>
-        <div class="hero-stat-pill"><div class="val" id="hStatRating">5.0★</div><div class="lbl">Rating</div></div>
-        <div class="hero-stat-pill"><div class="val" id="hStatActive">0</div><div class="lbl">Active</div></div>
-      </div>
-    </div>
-    <div class="stats-grid" id="driverStatsGrid"></div>
-    <div class="mob-only mob-pg">
-      <div class="mob-section-lbl">Available Orders <span class="mob-count-chip" id="mobAvailChip">0</span></div>
-      <div class="mob-order-list" id="mobAvailList"></div>
-      <div class="mob-section-lbl" style="margin-top:20px">My Active Deliveries</div>
-      <div class="mob-order-list" id="mobActiveList"></div>
-    </div>
-    <div class="dash-two-col desk-only">
-      <div class="content-card">
-        <div class="card-header"><h2><i data-lucide="shopping-bag" style="width:18px;height:18px;color:var(--accent)"></i> Available Orders <span id="availableCount" style="background:var(--accent);color:white;border-radius:999px;padding:2px 8px;font-size:.72rem;margin-left:4px">0</span></h2></div>
-        <div id="availableOrdersList" style="padding:16px;max-height:420px;overflow-y:auto"></div>
-      </div>
-      <div class="content-card">
-        <div class="card-header"><h2><i data-lucide="map-pin" style="width:18px;height:18px;color:var(--accent)"></i> My Active Deliveries</h2></div>
-        <div id="myDeliveriesList" style="padding:16px;max-height:420px;overflow-y:auto"></div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- AVAILABLE -->
-  <section id="available" class="page-content">
-    <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">Available Orders</h1>
-    <div id="locationBanner2" class="location-banner" style="display:none;margin-bottom:16px"></div>
-    <div class="mob-only mob-pg"><div class="mob-order-list" id="mobAvailFull"></div></div>
-    <div class="desk-only content-card" id="availableFullList" style="padding:0"></div>
-  </section>
-
-  <!-- DELIVERIES -->
-  <section id="deliveries" class="page-content">
-    <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">My Current Deliveries</h1>
-    <div class="mob-only mob-pg"><div class="mob-order-list" id="mobDelivFull"></div></div>
-    <div class="desk-only content-card" id="myDeliveriesFullList" style="padding:0"></div>
-  </section>
-
-  <!-- HISTORY -->
-  <section id="history" class="page-content">
-    <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">Order History</h1>
-    <div id="orderHistoryList" class="mob-pg"></div>
-  </section>
-
-  <!-- EARNINGS -->
-  <section id="earnings" class="page-content">
-    <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px">Earnings</h1>
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon"><i data-lucide="dollar-sign"></i></div><h3>Today</h3><p id="earningsToday" style="color:var(--accent)">R 0</p></div>
-      <div class="stat-card"><div class="stat-icon"><i data-lucide="trending-up"></i></div><h3>This Week</h3><p id="earningsWeek" style="color:var(--accent)">R 0</p></div>
-      <div class="stat-card"><div class="stat-icon"><i data-lucide="calendar"></i></div><h3>This Month</h3><p id="earningsMonth" style="color:var(--accent)">R 0</p></div>
-      <div class="stat-card"><div class="stat-icon"><i data-lucide="package-check"></i></div><h3>Total Delivered</h3><p id="totalDelivered" style="color:var(--accent)">0</p></div>
-    </div>
-  </section>
-
-  <!-- LEADERBOARD -->
-  <section id="leaderboard" class="page-content">
-    <div class="leaderboard-container mob-pg" style="max-width:700px">
-      <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:20px;padding:0">Leaderboard</h1>
-      <div class="leaderboard-header-card">
-        <div style="font-size:2rem;margin-bottom:8px;position:relative">🏆</div>
-        <h2>Top Drivers</h2>
-        <p>Best performing drivers by province this month</p>
-      </div>
-      <div class="leaderboard-province-filter" id="provinceFilter"></div>
-      <div id="leaderboardList"></div>
-    </div>
-  </section>
-
-  <!-- PROFILE -->
-  <section id="profile" class="page-content">
-    <div class="profile-container mob-pg" style="max-width:700px">
-      <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px;padding:0">Driver Profile</h1>
-      <div class="profile-hero-card">
-        <div class="profile-hero-inner">
-          <div class="profile-avatar-large" id="profileAvatar">D</div>
-          <div class="profile-hero-info">
-            <h2 id="profileName">Driver Name</h2>
-            <p id="profileID">DRV-XXXXXX</p>
-            <div class="profile-status-pill" id="profileStatusPill"><span class="online-dot"></span> Active Driver</div>
-          </div>
+    <!-- CAROUSEL TAB -->
+    <section class="tab-panel" id="tab-carousel">
+      <div class="panel-head">
+        <div>
+          <h1>Mokopane FM In Action</h1>
+          <p>Manage the photo carousel slides. Upload an image and set alt text for accessibility. Drag to reorder.</p>
         </div>
       </div>
-      <div class="profile-section-card">
-        <div class="profile-section-title">Personal Information</div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Full Name</div></div><input type="text" class="profile-pill-input" id="p-fullname" placeholder="Your full name"></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Vehicle Type</div></div><select class="profile-pill-input" id="p-vehicle"><option>Motorcycle</option><option>Bicycle</option><option>Car</option><option>Scooter</option><option>Bakkie</option></select></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">License / Reg Number</div></div><input type="text" class="profile-pill-input" id="p-license" placeholder="LN 12345678"></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Phone Number</div></div><input type="tel" class="profile-pill-input" id="p-phone" placeholder="+27 71 000 0000"></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Email Address</div></div><input type="email" class="profile-pill-input" id="p-email" placeholder="you@email.com"></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Emergency Contact</div></div><input type="tel" class="profile-pill-input" id="p-emergency" placeholder="+27 82 000 0000"></div>
-      </div>
-      <div class="profile-section-card">
-        <div class="profile-section-title">Driver Stats</div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Total Deliveries</div></div><input type="text" class="profile-pill-input" id="p-total-deliveries" value="0" readonly></div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Current Rating</div></div><input type="text" class="profile-pill-input" id="p-rating" value="5.0 ★" readonly></div>
-      </div>
-      <div class="profile-section-card">
-        <div class="profile-section-title">Payout Details</div>
-        <div class="profile-field-row"><div><div class="profile-field-label">Bank Details</div></div><input type="text" class="profile-pill-input" id="p-bank" placeholder="Bank name & account number"></div>
-      </div>
-      <button class="btn-primary" onclick="saveDriverProfile()" style="width:100%;justify-content:center;padding:14px;font-size:.95rem;border-radius:999px;margin-top:4px"><i data-lucide="save" style="width:16px;height:16px"></i> Save Profile</button>
-      <button onclick="openModal('logoutModal')" class="btn btn-danger" style="width:100%;margin-top:12px;justify-content:center;padding:14px;font-size:.95rem;border-radius:999px"><i data-lucide="log-out" style="width:18px;height:18px"></i> Log Out</button>
-      <div style="height:4px"></div>
-    </div>
-  </section>
-
-  <!-- SETTINGS -->
-  <section id="settings" class="page-content">
-    <div class="settings-container mob-pg" style="max-width:700px">
-      <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:26px;padding:0">Settings</h1>
-      <div class="settings-card">
-        <div class="settings-card-title">Availability</div>
-        <div class="settings-row">
-          <div><div class="settings-label">Online Status</div><div class="settings-sub">Show as available to receive orders</div></div>
-          <div class="toggle on" id="tog-online" onclick="toggleSetting(this,'online')"></div>
-        </div>
-        <div class="settings-row">
-          <div><div class="settings-label" style="display:flex;align-items:center;gap:8px">Busy Mode <span id="busyModeLabel" style="font-size:.7rem;color:var(--text-muted);font-weight:600"></span></div><div class="settings-sub">Pause orders — traffic, lunch, fuel, load-shedding</div></div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <button onclick="openModal('busyModeModal')" class="btn btn-warning" style="font-size:.75rem;padding:6px 14px"><i data-lucide="pause-circle" style="width:13px;height:13px"></i> <span id="busyBtnLabel">Set Busy</span></button>
-            <div class="toggle busy-color" id="tog-busy" onclick="toggleBusyMode(this)"></div>
-          </div>
-        </div>
-        <div class="settings-row"><div><div class="settings-label">Auto-Accept Nearby Orders</div><div class="settings-sub">Automatically accept orders within 2km</div></div><div class="toggle" id="tog-autoaccept" onclick="toggleSetting(this,'autoaccept')"></div></div>
-        <div class="settings-row"><div><div class="settings-label">Availability Schedule</div><div class="settings-sub">Use preset working hours</div></div><div class="toggle on" id="tog-schedule" onclick="toggleSetting(this,'schedule')"></div></div>
-      </div>
-      <div class="settings-card">
-        <div class="settings-card-title">Notifications</div>
-        <div class="settings-row"><div><div class="settings-label">Receive Order Alerts</div><div class="settings-sub">Get notified when new orders arrive</div></div><div class="toggle on" id="tog-alerts" onclick="toggleSetting(this,'alerts')"></div></div>
-        <div class="settings-row"><div><div class="settings-label">Push Notifications</div><div class="settings-sub">Browser push notifications</div></div><div class="toggle on" id="tog-push" onclick="toggleSetting(this,'push')"></div></div>
-      </div>
-      <div class="settings-card">
-        <div class="settings-card-title">Privacy & Location</div>
-        <div class="settings-row"><div><div class="settings-label">Live Location Sharing</div><div class="settings-sub">Share real-time location with customers</div></div><div class="toggle on" id="tog-location" onclick="toggleSetting(this,'location')"></div></div>
-      </div>
-      <div class="settings-card">
-        <div class="settings-card-title">App</div>
-        <div class="settings-row"><div><div class="settings-label">Dark Mode</div><div class="settings-sub">Switch to dark theme</div></div><div class="toggle" id="tog-dark" onclick="toggleSetting(this,'dark')"></div></div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- MOBILE BOTTOM NAV -->
-<div class="mobile-bottom-nav" id="mobileBottomNav" style="display:none">
-  <button class="mob-nav-btn active" id="mnd" onclick="mobileTab('dashboard','mnd')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Home
-  </button>
-  <button class="mob-nav-btn" id="mna" onclick="mobileTab('available','mna')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-    <span class="mob-nav-badge" id="mobNavBadge">0</span>Orders
-  </button>
-  <button class="mob-nav-btn" id="mnv" onclick="mobileTab('deliveries','mnv')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Active
-  </button>
-  <button class="mob-nav-btn" id="mne" onclick="mobileTab('earnings','mne')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Earnings
-  </button>
-  <button class="mob-nav-btn" id="mnh" onclick="mobileTab('history','mnh')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>History
-  </button>
-  <button class="mob-nav-btn" id="mnl" onclick="mobileTab('leaderboard','mnl')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>Board
-  </button>
-  <button class="mob-nav-btn" id="mnp" onclick="mobileTab('profile','mnp')">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
-  </button>
+      <div class="carousel-grid" id="carouselGrid"></div>
+    </section>
+  </main>
 </div>
 
-<!-- LOGOUT MODAL -->
-<div class="modal-overlay" id="logoutModal">
-  <div class="modal-content" style="max-width:400px;text-align:center">
-    <div class="modal-handle"></div>
-    <div style="width:64px;height:64px;border-radius:50%;background:#fff1f0;border:2px solid #ffcdc9;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="log-out" style="width:28px;height:28px;color:var(--danger)"></i></div>
-    <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:8px">Log Out?</h3>
-    <p style="color:var(--dim);margin-bottom:0">Are you sure you want to log out?</p>
-    <div class="modal-btn-row">
-      <button class="btn btn-danger" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="confirmLogout()"><i data-lucide="log-out" style="width:15px;height:15px"></i> Log Out</button>
-      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('logoutModal')">Cancel</button>
+<div class="loading-shell" id="loadingShell" style="display:none;"><span class="spinner"></span> Loading…</div>
+
+<div id="toastWrap"></div>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <h3 id="confirmTitle">Delete this item?</h3>
+    <p id="confirmBody">This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="confirmOk">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- ORDER DETAIL MODAL -->
-<div class="modal-overlay" id="orderDetailModal">
-  <div class="modal-content" style="max-width:600px">
-    <div class="modal-handle"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h3 style="font-size:1.1rem;font-weight:800" id="orderDetailTitle">Order Details</h3>
-      <button onclick="hideModal('orderDetailModal')" style="background:var(--surface2);border:none;border-radius:999px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:16px;height:16px"></i></button>
-    </div>
-    <div id="orderDetailBody"></div>
-  </div>
-</div>
+<!-- ═══════════════════════════════════════ FIREBASE ═══════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getDatabase, ref, onValue, set, update, remove, push, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<!-- PROOF OF DELIVERY MODAL -->
-<div class="modal-overlay" id="proofModal">
-  <div class="modal-content" style="max-width:500px">
-    <div class="modal-handle"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <h3 style="font-size:1.1rem;font-weight:800">📸 Photo Proof of Delivery</h3>
-      <button onclick="hideModal('proofModal')" style="background:var(--surface2);border:none;border-radius:999px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:16px;height:16px"></i></button>
-    </div>
-    <p style="font-size:.82rem;color:var(--dim);margin-bottom:16px">Take or upload a photo showing the delivered order at the customer's door.</p>
-    <div class="proof-upload-area" id="proofUploadArea">
-      <input type="file" id="proofFileInput" accept="image/*" capture="environment" onchange="handleProofPhoto(this)">
-      <img id="proofPreviewImg" class="proof-preview" src="" alt="Proof preview">
-      <div id="proofUploadPrompt">
-        <div class="proof-upload-icon">📷</div>
-        <div class="proof-upload-label">Tap to take a photo or upload</div>
-        <div class="proof-upload-sub">JPEG, PNG — max 10MB</div>
-      </div>
-    </div>
-    <div class="proof-uploading" id="proofUploading">
-      <div style="width:20px;height:20px;border:3px solid var(--accent-muted);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div>
-      Uploading photo to Cloudinary…
-    </div>
-    <div id="proofSuccessBlock" style="display:none;background:#edf9f2;border:1px solid #bbf0d3;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:.84rem;font-weight:600;color:var(--green)">
-      ✓ Photo uploaded — ready to confirm delivery
-    </div>
-    <div class="modal-btn-row">
-      <button class="btn btn-success" style="flex:2;justify-content:center;padding:14px;border-radius:999px" id="confirmDeliveredBtn" onclick="submitProofAndDeliver()" disabled>
-        <i data-lucide="check-circle" style="width:15px;height:15px"></i> Confirm Delivered
-      </button>
-      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('proofModal')">Cancel</button>
-    </div>
-  </div>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
+  authDomain: "test-17881.firebaseapp.com",
+  projectId: "test-17881",
+  storageBucket: "test-17881.firebasestorage.app",
+  messagingSenderId: "1057428047643",
+  appId: "1:1057428047643:web:f3801c0d933225a5cd35be",
+  databaseURL: "https://test-17881-default-rtdb.firebaseio.com"
+};
 
-<!-- BUSY MODE MODAL -->
-<div class="modal-overlay" id="busyModeModal">
-  <div class="modal-content" style="max-width:440px">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:4px">⏸ Set Busy Mode</h3>
-    <p style="font-size:.82rem;color:var(--dim);margin-bottom:6px">Choose a reason — you won't receive new orders while busy.</p>
-    <div class="busy-reason-grid" id="busyReasonGrid">
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🚦','Traffic')" data-reason="Traffic">
-        <div class="reason-icon">🚦</div><div class="reason-label">Traffic</div>
-      </div>
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🍽','Lunch break')" data-reason="Lunch break">
-        <div class="reason-icon">🍽</div><div class="reason-label">Lunch Break</div>
-      </div>
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'⚡','Load-shedding')" data-reason="Load-shedding">
-        <div class="reason-icon">⚡</div><div class="reason-label">Load-shedding</div>
-      </div>
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'⛽','Fuel')" data-reason="Fuel">
-        <div class="reason-icon">⛽</div><div class="reason-label">Low on Fuel</div>
-      </div>
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'🔧','Maintenance')" data-reason="Maintenance">
-        <div class="reason-icon">🔧</div><div class="reason-label">Vehicle Issue</div>
-      </div>
-      <div class="busy-reason-btn" onclick="selectBusyReason(this,'😴','Personal')" data-reason="Personal">
-        <div class="reason-icon">😴</div><div class="reason-label">Personal</div>
-      </div>
-    </div>
-    <div class="modal-btn-row">
-      <button class="btn btn-warning" style="flex:1;justify-content:center;padding:14px;border-radius:999px" id="confirmBusyBtn" onclick="confirmBusyMode()" disabled>
-        <i data-lucide="pause-circle" style="width:15px;height:15px"></i> Go Busy
-      </button>
-      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('busyModeModal')">Cancel</button>
-    </div>
-  </div>
-</div>
+const CLOUDINARY_CLOUD = 'dqkujefxj';
+const CLOUDINARY_PRESET = 'banter_box';
 
-<!-- DELETE MODAL -->
-<div class="modal-overlay" id="deleteConfirmModal">
-  <div class="modal-content" style="max-width:400px;text-align:center">
-    <div class="modal-handle"></div>
-    <div style="width:64px;height:64px;border-radius:50%;background:#fff1f0;border:2px solid #ffcdc9;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="trash-2" style="width:28px;height:28px;color:var(--danger)"></i></div>
-    <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:8px">Delete Order?</h3>
-    <p style="color:var(--dim);margin-bottom:0">This action cannot be undone.</p>
-    <div class="modal-btn-row">
-      <button class="btn btn-danger" style="flex:1;justify-content:center;padding:14px;border-radius:999px" id="confirmDeleteBtn"><i data-lucide="trash-2" style="width:15px;height:15px"></i> Delete</button>
-      <button class="btn btn-edit" style="flex:1;justify-content:center;padding:14px;border-radius:999px" onclick="hideModal('deleteConfirmModal')">Cancel</button>
-    </div>
-  </div>
-</div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-<div class="toast" id="toast"><i data-lucide="check-circle" style="width:18px;height:18px"></i><span id="toastMsg">Done</span></div>
+/* ──────────────────────────────────────────────────────────
+   SEED DATA — mirrors the cards currently hardcoded on the
+   public site. Used only if /shows or /carousel is empty,
+   so the dashboard starts pre-populated with real content.
+─────────────────────────────────────────────────────────── */
+const SEED_SHOWS = [
+  { name: "Morning Pulse", time: "Mon – Fri · 05:00 – 09:00", host: "The Morning Crew", mode: "gradient", gradA: "#7A1515", gradB: "#F5A800", initials: "MP", label: "Morning Pulse", imageUrl: "" },
+  { name: "Motse FM Midday", time: "Mon – Fri · 09:00 – 12:00", host: "Midday Drive", mode: "gradient", gradA: "#1a1a2e", gradB: "#7A1515", initials: "MM", label: "Motse FM Midday", imageUrl: "" },
+  { name: "Lunch & Vibes", time: "Mon – Fri · 12:00 – 16:00", host: "Afternoon Hosts", mode: "image", imageUrl: "https://i.postimg.cc/hGDhzd0N/drive.png", gradA: "#7A1515", gradB: "#F5A800", initials: "LV", label: "Lunch & Vibes" },
+  { name: "Drive Time", time: "Mon – Fri · 16:00 – 19:00", host: "Drive Team", mode: "gradient", gradA: "#0d2137", gradB: "#D48900", initials: "DT", label: "Drive Time", imageUrl: "" },
+  { name: "Gospel Hour", time: "Weekends · 10:00 – 14:00", host: "Gospel Hosts", mode: "gradient", gradA: "#1a2e1a", gradB: "#4E0D0D", initials: "GH", label: "Gospel Hour", imageUrl: "" },
+  { name: "Night Frequency", time: "Fri – Sat · 20:00 – 00:00", host: "Night Crew", mode: "gradient", gradA: "#0a0a1a", gradB: "#7A1515", initials: "NF", label: "Night Frequency", imageUrl: "" }
+];
 
-<script>
-/* ─── CONFIG ─────────────────────────────── */
-const firebaseConfig={apiKey:"AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",authDomain:"test-17881.firebaseapp.com",projectId:"test-17881",storageBucket:"test-17881.firebasestorage.app",messagingSenderId:"1057428047643",appId:"1:1057428047643:web:f3801c0d933225a5cd35be",databaseURL:"https://test-17881-default-rtdb.firebaseio.com/"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-const MAPBOX_TOKEN='pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
-mapboxgl.accessToken=MAPBOX_TOKEN;
-const CLOUDINARY_CLOUD='your_cloud_name';      // ← Replace
-const CLOUDINARY_PRESET='your_upload_preset';  // ← Replace (unsigned)
+const SEED_CAROUSEL = [
+  { imageUrl: "https://i.postimg.cc/28Rhrh2y/mtn-1.jpg", alt: "Mokopane FM Studio" },
+  { imageUrl: "https://i.postimg.cc/bJSSjwnf/mtn-2.jpg", alt: "Community Event" },
+  { imageUrl: "https://i.postimg.cc/8kWfKsNV/prem.jpg", alt: "Live Broadcast" },
+  { imageUrl: "https://i.postimg.cc/pLV9LZjC/police.jpg", alt: "Mokopane FM Team" },
+  { imageUrl: "https://i.postimg.cc/3wVW9Qcf/sassa.jpg", alt: "Mokopane FM Team" },
+  { imageUrl: "https://i.postimg.cc/V6tvVHyb/water.jpg", alt: "Mokopane FM Team" }
+];
 
-/* ─── STATE ──────────────────────────────── */
-let DRIVER_KEY=null,driverData=null,ordersCache={},pendingDeleteKey=null;
-let currentMapInstance=null,routeMapInstance=null;
-let driverLat=null,driverLng=null,locationError=null,locationWatcher=null,locBannerShown=false;
-let vendorCache={},gcCache={};
-let isOnline=navigator.onLine;
-let isBusy=false,busyReason='',selectedBusyEmoji='',selectedBusyReason='';
-let proofOrderKey=null,proofUploadedUrl=null;
-let selectedProvince='';
+/* ──────────────────────────────────────────────────────────
+   AUTH
+─────────────────────────────────────────────────────────── */
+const loginScreen = document.getElementById('loginScreen');
+const appShell = document.getElementById('appShell');
+const loginForm = document.getElementById('loginForm');
+const loginBtn = document.getElementById('loginBtn');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const loginError = document.getElementById('loginError');
+const userChip = document.getElementById('userChip');
 
-/* ─── OFFLINE CACHE ──────────────────────── */
-const CACHE_KEY='1busket_orders_cache';
-const CACHE_DRIVER_KEY='1busket_driver_cache';
-function saveOrdersToCache(orders){try{const arr=Object.entries(orders).slice(-20).reduce((a,[k,v])=>{a[k]=v;return a;},{});localStorage.setItem(CACHE_KEY,JSON.stringify(arr));localStorage.setItem(CACHE_DRIVER_KEY,JSON.stringify(driverData));}catch(e){}}
-function loadOrdersFromCache(){try{const raw=localStorage.getItem(CACHE_KEY);return raw?JSON.parse(raw):{};}catch(e){return{};}}
-function loadDriverFromCache(){try{const raw=localStorage.getItem(CACHE_DRIVER_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
+const googleProvider = new GoogleAuthProvider();
 
-/* ─── SESSION GUARD ──────────────────────── */
-(function(){
-  const s=JSON.parse(localStorage.getItem('1busket_driver_session')||'null');
-  if(!s||!s.key||(Date.now()-s.loggedAt)>=86400000){window.location.href='login.html';return;}
-  DRIVER_KEY=s.key;
-})();
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  loginBtn.disabled = true;
+  googleLoginBtn.disabled = true;
+  loginBtn.textContent = 'Signing in…';
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    loginError.textContent = friendlyAuthError(err.code);
+    loginError.style.display = 'block';
+    loginBtn.disabled = false;
+    googleLoginBtn.disabled = false;
+    loginBtn.textContent = 'Sign In';
+  }
+});
 
-const isMob=()=>window.innerWidth<=768;
+googleLoginBtn.addEventListener('click', async () => {
+  loginError.style.display = 'none';
+  loginBtn.disabled = true;
+  googleLoginBtn.disabled = true;
+  const originalHtml = googleLoginBtn.innerHTML;
+  googleLoginBtn.textContent = 'Connecting to Google…';
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (err) {
+    loginError.textContent = friendlyAuthError(err.code);
+    loginError.style.display = 'block';
+    loginBtn.disabled = false;
+    googleLoginBtn.disabled = false;
+    googleLoginBtn.innerHTML = originalHtml;
+  }
+});
 
-/* ─── ONLINE/OFFLINE ─────────────────────── */
-window.addEventListener('online',()=>{isOnline=true;document.getElementById('offlineBanner').classList.remove('show');showToast('Back online — syncing orders…','success');startDriverSync();});
-window.addEventListener('offline',()=>{isOnline=false;document.getElementById('offlineBanner').classList.add('show');ordersCache=loadOrdersFromCache();if(!driverData)driverData=loadDriverFromCache();if(driverData)applyDriverUI();renderDashboard();showToast('Offline — showing cached orders','error');});
-
-function updateBannerOffsets(){
-  const ob=document.getElementById('offlineBanner');
-  const bb=document.getElementById('busyBanner');
-  if(isOnline&&isBusy){bb.classList.remove('offline-offset');bb.style.top='0';}
-  else if(!isOnline&&isBusy){bb.classList.add('offline-offset');}
-}
-
-/* ─── BUSY MODE ──────────────────────────── */
-function selectBusyReason(el,emoji,reason){
-  document.querySelectorAll('.busy-reason-btn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedBusyEmoji=emoji;
-  selectedBusyReason=reason;
-  document.getElementById('confirmBusyBtn').disabled=false;
-}
-
-function confirmBusyMode(){
-  if(!selectedBusyReason)return;
-  isBusy=true;
-  busyReason=selectedBusyReason;
-  document.getElementById('busyReasonLabel').textContent=selectedBusyEmoji+' '+busyReason;
-  document.getElementById('busyBanner').classList.add('show');
-  document.getElementById('tog-busy').classList.add('on');
-  document.getElementById('busyBtnLabel').textContent='End Busy';
-  document.getElementById('busyModeLabel').textContent='• '+busyReason;
-  updateBannerOffsets();
-  if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({isBusy:true,busyReason,busyAt:Date.now()});
-  hideModal('busyModeModal');
-  showToast('Busy mode: '+busyReason+' — orders paused','success');
-  updateSidebarStatus();
-}
-
-function toggleBusyMode(el){
-  if(isBusy){goOnlineFromBanner();}
-  else{openModal('busyModeModal');}
-}
-
-function goOnlineFromBanner(){
-  isBusy=false;busyReason='';
-  document.getElementById('busyBanner').classList.remove('show');
-  document.getElementById('tog-busy').classList.remove('on');
-  document.getElementById('busyBtnLabel').textContent='Set Busy';
-  document.getElementById('busyModeLabel').textContent='';
-  if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY).update({isBusy:false,busyReason:null});
-  document.querySelectorAll('.busy-reason-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('confirmBusyBtn').disabled=true;
-  selectedBusyReason='';selectedBusyEmoji='';
-  updateBannerOffsets();
-  showToast('You\'re back online! 🛵','success');
-  updateSidebarStatus();
-}
-
-function updateSidebarStatus(){
-  const line=document.getElementById('sidebarStatusLine');
-  if(!line)return;
-  if(isBusy)line.innerHTML=`<span class="busy-dot"></span><span style="color:#ff9500">Busy: ${busyReason}</span>`;
-  else line.innerHTML=`<span class="online-dot"></span>Online`;
-  const pill=document.getElementById('profileStatusPill');
-  if(pill){
-    if(isBusy)pill.innerHTML=`<span class="busy-dot"></span> Busy — ${busyReason}`;
-    else pill.innerHTML=`<span class="online-dot"></span> Active Driver`;
+function friendlyAuthError(code) {
+  switch (code) {
+    case 'auth/invalid-email': return 'That email address looks invalid.';
+    case 'auth/user-disabled': return 'This account has been disabled.';
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential': return 'Incorrect email or password.';
+    case 'auth/too-many-requests': return 'Too many attempts. Please wait a moment and try again.';
+    case 'auth/popup-closed-by-user': return 'Sign-in window closed before authentication completed.';
+    case 'auth/cancelled-popup-request': return 'The connection request was interrupted. Please try again.';
+    default: return 'Sign-in failed. Please try again.';
   }
 }
 
-/* ─── HELPERS ────────────────────────────── */
-function getDriverFullName(d){if(!d)return'Driver';if(d.name&&d.name.trim())return d.name.trim();const f=d.firstName?d.firstName.trim():'',l=d.lastName?d.lastName.trim():'';return(f+' '+l).trim()||'Driver';}
-function getCustomerName(o){return o.customerName||o.userName||(typeof o.customer==='string'?o.customer:null)||(o.userEmail?o.userEmail.split('@')[0]:null)||'Customer';}
-function getRestaurantAddrSync(o){let a=o.vendorAddress||o.restaurantAddress||o.vendorLocation||(o.vendor&&(o.vendor.address||o.vendor.location))||o.pickupAddress||o.storeAddress;if(a&&a.trim())return a.trim();if(o.vendorKey&&vendorCache[o.vendorKey])return vendorCache[o.vendorKey];return null;}
-function getCustomerAddr(o){return o.deliveryAddress||o.address||o.customerAddress||o.shippingAddress||o.fullAddress||o.dropoffAddress||o.destination||(o.location&&(typeof o.location==='string'?o.location:o.location.address))||(o.customer&&typeof o.customer==='object'?o.customer.address:null)||null;}
-async function getVendorAddr(vk){if(!vk||vendorCache[vk]!==undefined)return vendorCache[vk]||null;try{const snap=await db.ref('vendors/'+vk).once('value');const v=snap.val();if(v&&v.address){const a=[v.address.street,v.address.suburb,v.address.city,v.address.province].filter(Boolean).join(', ')||v.address.fullAddress||null;vendorCache[vk]=a;return a;}if(v&&v.location&&typeof v.location==='string'){vendorCache[vk]=v.location;return v.location;}}catch(e){}vendorCache[vk]=null;return null;}
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-/* ─── GEOCODE ────────────────────────────── */
-async function geocode(addr){
-  if(!addr)return null;
-  if(gcCache[addr])return gcCache[addr];
-  try{const r=await fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(addr)}&access_token=${MAPBOX_TOKEN}&limit=1&country=ZA`);const d=await r.json();if(d.features&&d.features.length>0){const[lng,lat]=d.features[0].geometry.coordinates;gcCache[addr]={lat,lng};return{lat,lng};}}catch(e){}return null;
-}
+let unsubShows = null, unsubCarousel = null;
 
-/* ─── LOCATION ───────────────────────────── */
-function startLocationWatch(){
-  if(!navigator.geolocation){locationError='Geolocation not supported';updateLocBanners('error');renderDashboard();return;}
-  updateLocBanners('fetching');
-  navigator.geolocation.getCurrentPosition(pos=>{
-    driverLat=pos.coords.latitude;driverLng=pos.coords.longitude;locationError=null;
-    updateLocBanners('success');
-    if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
-    renderDashboard();
-  },err=>{locationError=err.code===1?'Location denied. Showing all orders.':'Could not get location.';updateLocBanners('error');renderDashboard();},{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
-  if(locationWatcher)navigator.geolocation.clearWatch(locationWatcher);
-  locationWatcher=navigator.geolocation.watchPosition(pos=>{
-    driverLat=pos.coords.latitude;driverLng=pos.coords.longitude;
-    if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({lastLat:driverLat,lastLng:driverLng,lastSeen:Date.now()});
-    updateLocBanners('success');
-  },()=>{},{enableHighAccuracy:true,maximumAge:60000});
-}
-
-function updateLocBanners(state){
-  const b1=document.getElementById('locationBanner'),b2=document.getElementById('locationBanner2');
-  const ms=document.getElementById('mobLocStatus');
-  [b1,b2].forEach(b=>{if(b)b.style.display='none';});
-  if(state==='fetching'){
-    const html=`<i data-lucide="loader" style="width:18px;height:18px;animation:spin 1s linear infinite"></i> Getting your location…`;
-    [b1,b2].forEach(b=>{if(!b)return;b.className='location-banner';b.style.display='flex';b.innerHTML=html;});
-    if(ms)ms.innerHTML=`<i data-lucide="map-pin" style="width:12px;height:12px"></i> Locating…`;
-  }else if(state==='success'){
-    if(!locBannerShown){[b1,b2].forEach(b=>{if(!b)return;b.className='location-banner success';b.style.display='flex';b.innerHTML=`<i data-lucide="check-circle" style="width:18px;height:18px"></i> Showing all available orders`;});setTimeout(()=>{[b1,b2].forEach(b=>{if(b)b.style.display='none';});},4000);locBannerShown=true;}
-    if(ms)ms.innerHTML=`<i data-lucide="map-pin" style="width:12px;height:12px"></i> Located`;
-  }else if(state==='error'){
-    const html=`<i data-lucide="alert-circle" style="width:18px;height:18px"></i> ${locationError}`;
-    [b1,b2].forEach(b=>{if(!b)return;b.className='location-banner error';b.style.display='flex';b.innerHTML=html;});
-    if(ms)ms.innerHTML=`<i data-lucide="alert-circle" style="width:12px;height:12px"></i> No location`;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loginScreen.style.display = 'none';
+    appShell.style.display = 'block';
+    userChip.textContent = user.email || user.displayName || 'Authorized User';
+    loginBtn.disabled = false;
+    googleLoginBtn.disabled = false;
+    loginBtn.textContent = 'Sign In';
+    document.getElementById('loginForm').reset();
+    initData();
+  } else {
+    appShell.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    if (unsubShows) { unsubShows(); unsubShows = null; }
+    if (unsubCarousel) { unsubCarousel(); unsubCarousel = null; }
   }
-  lucide.createIcons();
+});
+
+/* ──────────────────────────────────────────────────────────
+   TOASTS + SAVE INDICATOR
+─────────────────────────────────────────────────────────── */
+const toastWrap = document.getElementById('toastWrap');
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="dot"></span><span>${escapeHtml(msg)}</span>`;
+  toastWrap.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 3200);
 }
 
-/* ─── INIT ───────────────────────────────── */
-function initPortal(){
-  showShimmer();
-  if(!isOnline){ordersCache=loadOrdersFromCache();driverData=loadDriverFromCache();if(driverData)applyDriverUI();renderDashboard();hideShimmer();document.getElementById('offlineBanner').classList.add('show');}
-  else{startDriverSync();}
-  startLocationWatch();
-  buildLeaderboardProvinces();
-  setTimeout(()=>{
-    const mob=isMob();
-    document.getElementById('driverSidebar').style.display=mob?'none':'flex';
-    if(mob){document.getElementById('mobileTopbar').style.display='flex';document.getElementById('mobileBottomNav').style.display='flex';}
-    hideShimmer();lucide.createIcons();
-  },1100);
+const saveIndicator = document.getElementById('saveIndicator');
+const saveIndicatorText = document.getElementById('saveIndicatorText');
+let saveResetTimer = null;
+function setSaveState(state) {
+  clearTimeout(saveResetTimer);
+  saveIndicator.classList.remove('saving', 'error');
+  if (state === 'saving') {
+    saveIndicator.classList.add('saving');
+    saveIndicatorText.textContent = 'Saving…';
+  } else if (state === 'error') {
+    saveIndicator.classList.add('error');
+    saveIndicatorText.textContent = 'Save failed';
+  } else {
+    saveIndicatorText.textContent = 'Synced';
+    saveResetTimer = setTimeout(() => { saveIndicatorText.textContent = 'Synced'; }, 1500);
+  }
 }
 
-function showShimmer(){document.getElementById('shimmerOverlay').classList.add('active');}
-function hideShimmer(){const s=document.getElementById('shimmerOverlay');s.classList.add('fade-out');setTimeout(()=>s.classList.remove('active','fade-out'),600);}
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str ?? '';
+  return d.innerHTML;
+}
 
-function startDriverSync(){
-  if(!DRIVER_KEY||!isOnline)return;
-  db.ref('drivers/'+DRIVER_KEY).on('value',snap=>{
-    driverData=snap.val();
-    if(driverData){
-      applyDriverUI();
-      // Restore busy state
-      if(driverData.isBusy&&!isBusy){isBusy=true;busyReason=driverData.busyReason||'On break';selectedBusyEmoji='⏸';document.getElementById('busyReasonLabel').textContent=busyReason;document.getElementById('busyBanner').classList.add('show');document.getElementById('tog-busy').classList.add('on');document.getElementById('busyBtnLabel').textContent='End Busy';document.getElementById('busyModeLabel').textContent='• '+busyReason;updateSidebarStatus();}
-    }
+/* ──────────────────────────────────────────────────────────
+   CONFIRM MODAL
+─────────────────────────────────────────────────────────── */
+const confirmOverlay = document.getElementById('confirmOverlay');
+const confirmTitle = document.getElementById('confirmTitle');
+const confirmBody = document.getElementById('confirmBody');
+const confirmOk = document.getElementById('confirmOk');
+const confirmCancel = document.getElementById('confirmCancel');
+let confirmResolver = null;
+
+function askConfirm(title, body) {
+  confirmTitle.textContent = title;
+  confirmBody.textContent = body;
+  confirmOverlay.classList.add('active');
+  return new Promise((resolve) => { confirmResolver = resolve; });
+}
+confirmOk.addEventListener('click', () => { confirmOverlay.classList.remove('active'); confirmResolver?.(true); });
+confirmCancel.addEventListener('click', () => { confirmOverlay.classList.remove('active'); confirmResolver?.(false); });
+confirmOverlay.addEventListener('click', (e) => { if (e.target === confirmOverlay) { confirmOverlay.classList.remove('active'); confirmResolver?.(false); } });
+
+/* ──────────────────────────────────────────────────────────
+   TABS
+─────────────────────────────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
   });
-  db.ref('orders').on('value',snap=>{
-    ordersCache=snap.val()||{};
-    saveOrdersToCache(ordersCache);
-    renderDashboard();updateHistoryTab();updateEarningsTab();renderLeaderboard();
-  });
-}
+});
 
-function applyDriverUI(){
-  const name=getDriverFullName(driverData);
-  const init=name.charAt(0).toUpperCase();
-  ['driverAvatar','profileAvatar','mobAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
-  const sn=document.getElementById('driverSidebarName');if(sn)sn.textContent=name;
-  const pn=document.getElementById('profileName');if(pn)pn.textContent=name;
-  const pi=document.getElementById('profileID');if(pi)pi.textContent=driverData.driverID||'DRV-XXXXXX';
-  const fn=name.split(' ')[0];
-  const ht=document.getElementById('dashHeroTitle');if(ht)ht.textContent=`Hey ${fn}! 🛵`;
-  const pf=document.getElementById('p-fullname');if(pf)pf.value=name;
-  if(driverData.vehicleType){const el=document.getElementById('p-vehicle');if(el)el.value=driverData.vehicleType;}
-  if(driverData.licenseNumber){const el=document.getElementById('p-license');if(el)el.value=driverData.licenseNumber;}
-  if(driverData.phone){const el=document.getElementById('p-phone');if(el)el.value=driverData.phone;}
-  if(driverData.email){const el=document.getElementById('p-email');if(el)el.value=driverData.email;}
-  if(driverData.emergencyContact){const el=document.getElementById('p-emergency');if(el)el.value=driverData.emergencyContact;}
-  if(driverData.bankDetails){const el=document.getElementById('p-bank');if(el)el.value=driverData.bankDetails;}
-  if(driverData.rating){const el=document.getElementById('p-rating');if(el)el.value=driverData.rating+' ★';const hr=document.getElementById('hStatRating');if(hr)hr.textContent=driverData.rating+'★';}
-  if(driverData.settings){['online','autoaccept','schedule','alerts','push','location','dark'].forEach(k=>{const tog=document.getElementById('tog-'+k);if(tog){if(driverData.settings[k])tog.classList.add('on');else tog.classList.remove('on');}});}
-  if(driverLat===null&&driverData.lastLat){driverLat=driverData.lastLat;driverLng=driverData.lastLng;}
-  updateSidebarStatus();
-}
+/* ──────────────────────────────────────────────────────────
+   CLOUDINARY UPLOAD
+─────────────────────────────────────────────────────────── */
+async function uploadToCloudinary(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error('No file selected'));
+    if (!file.type.startsWith('image/')) return reject(new Error('Please choose an image file'));
+    if (file.size > 10 * 1024 * 1024) return reject(new Error('Image is larger than 10MB'));
 
-/* ─── DASHBOARD RENDER ───────────────────── */
-let dashDebounce=null;
-function renderDashboard(){clearTimeout(dashDebounce);dashDebounce=setTimeout(_renderDashboard,120);}
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
 
-async function _renderDashboard(){
-  const entries=Object.entries(ordersCache);
-  // If busy, hide available orders from driver
-  const ready=isBusy?[]:entries.filter(([k,o])=>o.status==='ready'&&!o.driverKey);
-  const myActive=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&(o.status==='assigned'||o.status==='out_for_delivery'));
-  for(const[key,o]of ready){if(!getRestaurantAddrSync(o)&&o.vendorKey&&!vendorCache[o.vendorKey])await getVendorAddr(o.vendorKey);}
-  const count=ready.length;
-
-  // badges
-  const ab=document.getElementById('availableBadge');if(ab){if(count>0&&!isBusy){ab.style.display='inline-block';ab.textContent=count;}else ab.style.display='none';}
-  const mnb=document.getElementById('mobNavBadge');if(mnb){if(count>0&&!isBusy){mnb.textContent=count;mnb.classList.add('visible');}else mnb.classList.remove('visible');}
-  const ac=document.getElementById('availableCount');if(ac)ac.textContent=isBusy?'Paused':count;
-  const mc=document.getElementById('mobAvailChip');if(mc)mc.textContent=isBusy?'Paused':count;
-
-  // hero stats
-  const today=new Date().toDateString();
-  const todayDel=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&o.status==='delivered'&&new Date(o.createdAt).toDateString()===today);
-  const todayEarn=todayDel.reduce((s,[k,o])=>s+Number(o.total||0)*0.15,0);
-  const hst=document.getElementById('hStatToday');if(hst)hst.textContent=todayDel.length;
-  const hse=document.getElementById('hStatEarn');if(hse)hse.textContent='R'+todayEarn.toFixed(0);
-  const hsa=document.getElementById('hStatActive');if(hsa)hsa.textContent=myActive.length;
-
-  // route optimization
-  renderRouteOptimisation(myActive);
-
-  const noAvail=isBusy
-    ?`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">⏸</div><div style="font-weight:700;margin-bottom:4px">Busy mode: ${busyReason}</div><div style="font-size:.82rem">You won't receive new orders. <a href="#" onclick="goOnlineFromBanner();return false;" style="color:var(--accent);font-weight:700">Go online</a></div></div>`
-    :`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">🛵</div><div style="font-weight:700;margin-bottom:4px">No available orders</div><div style="font-size:.82rem">All ready orders will appear here</div></div>`;
-  const noActive=`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">📦</div><div style="font-weight:700;margin-bottom:4px">No active deliveries</div><div style="font-size:.82rem">Accept an order to get started</div></div>`;
-
-  const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
-  set('availableOrdersList',ready.length===0?noAvail:ready.map(([k,o])=>buildDeskAvail(k,o)).join(''));
-  set('myDeliveriesList',myActive.length===0?noActive:myActive.map(([k,o])=>buildDeskActive(k,o)).join(''));
-  set('availableFullList',ready.length===0?`<div style="padding:16px">${noAvail}</div>`:ready.map(([k,o])=>buildDeskAvail(k,o)).join(''));
-  set('myDeliveriesFullList',myActive.length===0?`<div style="padding:16px">${noActive}</div>`:myActive.map(([k,o])=>buildDeskActive(k,o)).join(''));
-  set('mobAvailList',ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join(''));
-  set('mobActiveList',myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join(''));
-  set('mobAvailFull',ready.length===0?noAvail:ready.map(([k,o],i)=>buildMobAvail(k,o,i)).join(''));
-  set('mobDelivFull',myActive.length===0?noActive:myActive.map(([k,o],i)=>buildMobActive(k,o,i)).join(''));
-
-  const totalDel=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&o.status==='delivered').length;
-  const ptd=document.getElementById('p-total-deliveries');if(ptd)ptd.value=totalDel;
-  const sg=document.getElementById('driverStatsGrid');if(sg)sg.innerHTML=`
-    <div class="stat-card"><div class="stat-icon"><i data-lucide="package"></i></div><h3>Deliveries Today</h3><p>${todayDel.length}</p></div>
-    <div class="stat-card"><div class="stat-icon"><i data-lucide="dollar-sign"></i></div><h3>Earnings Today</h3><p style="color:var(--accent)">R${todayEarn.toFixed(0)}</p></div>
-    <div class="stat-card"><div class="stat-icon"><i data-lucide="star"></i></div><h3>Rating</h3><p>${driverData?.rating||'5.0'} ★</p></div>
-    <div class="stat-card"><div class="stat-icon"><i data-lucide="clock"></i></div><h3>Active Orders</h3><p>${myActive.length}</p></div>`;
-  lucide.createIcons();
-}
-
-/* ─── ROUTE OPTIMISATION ─────────────────── */
-let routeOptOrders=[];
-async function renderRouteOptimisation(myActive){
-  const card=document.getElementById('routeOptCard');
-  if(myActive.length<2){if(card)card.style.display='none';if(routeMapInstance){routeMapInstance.remove();routeMapInstance=null;}return;}
-  if(card)card.style.display='block';
-  routeOptOrders=myActive;
-
-  // Build stops list
-  const stopListEl=document.getElementById('routeStopList');
-  if(!stopListEl)return;
-  let stopsHtml='';
-  let stopNum=1;
-  for(const[key,o]of myActive){
-    const ra=getRestaurantAddrSync(o)||'Restaurant';
-    stopsHtml+=`<div class="route-stop"><div class="route-stop-num pickup">${stopNum++}</div><div class="route-stop-info"><div class="route-stop-type" style="color:rgba(255,255,255,.5)">Pickup · ${o.vendorName||'Restaurant'}</div><div class="route-stop-addr">${ra}</div></div></div>`;
-    if(o.status==='out_for_delivery'){
-      const ca=getCustomerAddr(o)||'Customer';
-      stopsHtml+=`<div class="route-stop"><div class="route-stop-num delivery">${stopNum++}</div><div class="route-stop-info"><div class="route-stop-type" style="color:rgba(255,255,255,.5)">Delivery · ${getCustomerName(o)}</div><div class="route-stop-addr">${ca}</div></div></div>`;
-    }
-  }
-  stopListEl.innerHTML=stopsHtml;
-
-  // Build route on map
-  setTimeout(async()=>{
-    const mapEl=document.getElementById('routeOptMap');
-    if(!mapEl)return;
-    if(routeMapInstance){routeMapInstance.remove();routeMapInstance=null;}
-    try{
-      const map=new mapboxgl.Map({container:'routeOptMap',style:'mapbox://styles/mapbox/dark-v11',center:[28.4,-25.7],zoom:11});
-      routeMapInstance=map;
-      map.on('load',async()=>{
-        map.resize();
-        const coords=[];
-        const colors={pickup:'#1a7a4a',delivery:'#ff751f'};
-        for(const[key,o]of myActive){
-          const ra=getRestaurantAddrSync(o);
-          if(ra){const g=await geocode(ra);if(g){new mapboxgl.Marker({color:colors.pickup}).setLngLat([g.lng,g.lat]).addTo(map);coords.push([g.lng,g.lat]);}}
-          if(o.status==='out_for_delivery'){const ca=getCustomerAddr(o);if(ca){const g=await geocode(ca);if(g){new mapboxgl.Marker({color:colors.delivery}).setLngLat([g.lng,g.lat]).addTo(map);coords.push([g.lng,g.lat]);}}}
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300 && res.secure_url) {
+          resolve(res.secure_url);
+        } else {
+          reject(new Error(res.error?.message || 'Upload failed'));
         }
-        if(coords.length>=2){
-          const coordStr=coords.map(c=>c.join(',')).join(';');
-          try{
-            const r=await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${coordStr}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`);
-            const d=await r.json();
-            if(d.routes&&d.routes[0]){
-              map.addSource('opt-route',{type:'geojson',data:{type:'Feature',properties:{},geometry:d.routes[0].geometry}});
-              map.addLayer({id:'opt-route',type:'line',source:'opt-route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#ff751f','line-width':4,'line-opacity':.85,'line-dasharray':[1,0]}});
-              const bounds=coords.reduce((b,c)=>b.extend(c),new mapboxgl.LngLatBounds(coords[0],coords[0]));
-              map.fitBounds(bounds,{padding:30});
-            }
-          }catch(e){}
-        }else if(coords.length===1){map.setCenter(coords[0]);map.setZoom(13);}
-      });
-    }catch(e){console.error('Route map error:',e);}
-  },300);
+      } catch {
+        reject(new Error('Upload failed — unexpected response'));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Upload failed — network error'));
+    xhr.send(formData);
+  });
 }
 
-window.openGoogleMapsRoute=async function(){
-  if(!routeOptOrders.length)return;
-  const waypoints=[];
-  for(const[key,o]of routeOptOrders){
-    const ra=getRestaurantAddrSync(o);if(ra)waypoints.push(ra);
-    if(o.status==='out_for_delivery'){const ca=getCustomerAddr(o);if(ca)waypoints.push(ca);}
-  }
-  if(!waypoints.length)return;
-  const dest=encodeURIComponent(waypoints[waypoints.length-1]);
-  const wps=waypoints.slice(0,-1).map(w=>`via:${encodeURIComponent(w)}`).join('|');
-  const url=`https://www.google.com/maps/dir/?api=1&destination=${dest}${wps?'&waypoints='+wps:''}`;
-  window.open(url,'_blank');
-};
+/* ──────────────────────────────────────────────────────────
+   GENERIC DRAG-TO-REORDER (mouse + touch via HTML5 DnD where
+   available, with pointer-based fallback for touch devices)
+─────────────────────────────────────────────────────────── */
+function makeSortable(container, itemSelector, onReorder) {
+  let dragEl = null;
 
-/* ─── DESKTOP BUILDERS ───────────────────── */
-function buildDeskAvail(key,o){
-  const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
-  const total=Number(o.total||0).toFixed(2);
-  const orderNum=o.orderNumber||key.slice(-6);
-  const vendor=o.vendorName||'Restaurant';
-  const items=(o.items||[]).length;
-  const customer=getCustomerName(o);
-  return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><strong style="font-size:.92rem">${vendor}</strong><span class="order-meta-pill pill-blue">Order #${orderNum}</span></div><div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="store" style="width:14px;height:14px;color:#1a7a4a;flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:#1a7a4a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Pickup from Restaurant</div><div style="font-size:.82rem;font-weight:600;color:#14532d">${ra}</div></div></div><div style="background:#fef9c3;border:1px solid #fcd34d;border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:8px"><i data-lucide="lock" style="width:13px;height:13px;color:#92400e;flex-shrink:0"></i><div style="font-size:.75rem;color:#92400e;font-weight:600">Customer address revealed after accepting</div></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-weight:800;color:var(--accent);font-size:1rem">R${total}</span><span style="font-size:.75rem;color:var(--dim)">${items} item${items!==1?'s':''}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div></div><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0"><button onclick="acceptDelivery('${key}')" class="btn btn-success"><i data-lucide="check" style="width:13px;height:13px"></i> Accept</button><button onclick="viewOrderDetail('${key}')" class="btn btn-edit"><i data-lucide="eye" style="width:13px;height:13px"></i> Details</button></div></div></div>`;
+  container.addEventListener('dragstart', (e) => {
+    const item = e.target.closest(itemSelector);
+    if (!item) return;
+    dragEl = item;
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', item.dataset.id);
+  });
+
+  container.addEventListener('dragend', (e) => {
+    const item = e.target.closest(itemSelector);
+    if (item) item.classList.remove('dragging');
+    container.querySelectorAll(itemSelector).forEach(el => el.classList.remove('drag-over'));
+    dragEl = null;
+  });
+
+  container.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const target = e.target.closest(itemSelector);
+    container.querySelectorAll(itemSelector).forEach(el => el.classList.remove('drag-over'));
+    if (target && target !== dragEl) target.classList.add('drag-over');
+  });
+
+  container.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target.closest(itemSelector);
+    container.querySelectorAll(itemSelector).forEach(el => el.classList.remove('drag-over'));
+    if (!target || !dragEl || target === dragEl) return;
+
+    const items = Array.from(container.querySelectorAll(itemSelector));
+    const dragIdx = items.indexOf(dragEl);
+    const targetIdx = items.indexOf(target);
+    if (dragIdx < targetIdx) {
+      target.after(dragEl);
+    } else {
+      target.before(dragEl);
+    }
+    const newOrderIds = Array.from(container.querySelectorAll(itemSelector)).map(el => el.dataset.id);
+    onReorder(newOrderIds);
+  });
 }
 
-function buildDeskActive(key,o){
-  const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
-  const ca=getCustomerAddr(o);
-  const orderNum=o.orderNumber||key.slice(-6);
-  const statusMap={assigned:{label:'Assigned — Awaiting Pickup',cls:'pill-yellow'},out_for_delivery:{label:'Out for Delivery',cls:'pill-blue'}};
-  const st=statusMap[o.status]||{label:o.status,cls:'pill-gray'};
-  const customer=getCustomerName(o);
-  const delBlock=o.status==='out_for_delivery'?`<div style="background:var(--accent-light);border:1px solid rgba(255,117,31,.2);border-radius:10px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="map-pin" style="width:14px;height:14px;color:var(--accent);flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">② Deliver to Customer</div><div style="font-size:.82rem;font-weight:700;color:var(--text)">${ca||'Address not available'}</div></div></div>`:'';
-  const proofBlock=o.deliveryProofUrl?`<div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px"><i data-lucide="camera" style="width:13px;height:13px;color:var(--green);flex-shrink:0"></i><span style="font-size:.75rem;color:var(--green);font-weight:700">Photo proof uploaded ✓</span><a href="${o.deliveryProofUrl}" target="_blank" style="font-size:.72rem;color:var(--blue);font-weight:600;margin-left:4px">View</a></div>`:'';
-  const actionBtn=o.status==='assigned'
-    ?`<button onclick="acceptAssignment('${key}')" class="btn btn-success"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Accept & Reveal</button>`
-    :`<button onclick="openProofModal('${key}')" class="btn btn-success"><i data-lucide="camera" style="width:13px;height:13px"></i> Proof & Deliver</button>`;
-  return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><strong style="font-size:.92rem">${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${st.cls}">${st.label}</span></div><div style="background:#edf9f2;border:1px solid #bbf0d3;border-radius:10px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px"><i data-lucide="store" style="width:14px;height:14px;color:#1a7a4a;flex-shrink:0;margin-top:2px"></i><div><div style="font-size:.68rem;font-weight:700;color:#1a7a4a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">① Pick up from Restaurant</div><div style="font-size:.82rem;font-weight:600;color:#14532d">${ra}</div></div></div>${delBlock}${proofBlock}<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:800;color:var(--accent)">R${Number(o.total||0).toFixed(2)}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div></div><div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">${actionBtn}<button onclick="viewOrderDetail('${key}')" class="btn btn-edit"><i data-lucide="map" style="width:13px;height:13px"></i> Map</button><button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger"><i data-lucide="trash-2" style="width:13px;height:13px"></i> Delete</button></div></div></div>`;
+/* ──────────────────────────────────────────────────────────
+   SHOWS — DATA LAYER
+─────────────────────────────────────────────────────────── */
+const showsRef = ref(db, 'shows');
+const carouselRef = ref(db, 'carousel');
+let showsCache = {};
+let carouselCache = {};
+
+function initData() {
+  if (unsubShows) unsubShows();
+  if (unsubCarousel) unsubCarousel();
+
+  unsubShows = onValue(showsRef, async (snap) => {
+    const val = snap.val();
+    if (!val) {
+      // Seed on first run
+      await seedShows();
+      return;
+    }
+    showsCache = val;
+    renderShows();
+  }, (err) => { console.error(err); toast('Could not load shows: ' + err.message, 'error'); });
+
+  unsubCarousel = onValue(carouselRef, async (snap) => {
+    const val = snap.val();
+    if (!val) {
+      await seedCarousel();
+      return;
+    }
+    carouselCache = val;
+    renderCarousel();
+  }, (err) => { console.error(err); toast('Could not load carousel: ' + err.message, 'error'); });
 }
 
-/* ─── MOBILE CARD BUILDERS ───────────────── */
-const msvg={
-  store:`<svg viewBox="0 0 24 24" fill="none" stroke="#1a7a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;margin-top:2px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
-  pin:`<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;margin-top:2px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
-  lock:`<svg viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;margin-top:2px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`,
-  user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-  map:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`,
-  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="20 6 9 17 4 12"/></svg>`,
-  camera:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
-  eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>`
-};
-
-function buildMobAvail(key,o,idx){
-  const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
-  const total=Number(o.total||0).toFixed(2);
-  const orderNum=o.orderNumber||key.slice(-6);
-  const vendor=o.vendorName||'Restaurant';
-  const items=(o.items||[]).length;
-  const customer=getCustomerName(o);
-  return`<div class="mob-card" style="animation-delay:${idx*.05}s">
-    <div class="mob-card-head"><div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">Order #${orderNum}</div></div><div class="mob-order-amount">R${total}</div></div>
-    <div class="mob-addr-row pickup">${msvg.store}<div><div class="mob-addr-lbl">Pick up from</div><div class="mob-addr-val">${ra}</div></div></div>
-    <div class="mob-addr-row locked">${msvg.lock}<div><div class="mob-addr-lbl">Delivery address</div><div class="mob-addr-val">Revealed after accepting</div></div></div>
-    <div class="mob-card-foot">
-      <div class="mob-meta-row"><span class="mob-chip">${msvg.user} ${customer}</span><span class="mob-chip">${items} item${items!==1?'s':''}</span></div>
-      <div class="mob-btn-row">
-        <button class="mob-btn mob-btn-outline" onclick="viewOrderDetail('${key}')">${msvg.map}</button>
-        <button class="mob-btn mob-btn-accept" onclick="acceptDelivery('${key}')">${msvg.check} Accept</button>
-      </div>
-    </div>
-  </div>`;
+async function seedShows() {
+  const updates = {};
+  SEED_SHOWS.forEach((show, i) => {
+    const key = push(showsRef).key;
+    updates[key] = { ...show, order: i, createdAt: Date.now() };
+  });
+  await update(showsRef, updates);
 }
 
-function buildMobActive(key,o,idx){
-  const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
-  const ca=getCustomerAddr(o);
-  const orderNum=o.orderNumber||key.slice(-6);
-  const vendor=o.vendorName||'Restaurant';
-  const customer=getCustomerName(o);
-  const stLabel=o.status==='assigned'?'Awaiting Pickup':'Out for Delivery';
-  const stCls=o.status==='assigned'?'assigned':'out_for_delivery';
-  const addrBlock=o.status==='out_for_delivery'&&ca
-    ?`<div class="mob-addr-row delivery">${msvg.pin}<div><div class="mob-addr-lbl">② Deliver to</div><div class="mob-addr-val">${ca}</div></div></div>`
-    :`<div class="mob-addr-row locked">${msvg.lock}<div><div class="mob-addr-lbl">Customer address</div><div class="mob-addr-val">Accept to reveal</div></div></div>`;
-  const proofBadge=o.deliveryProofUrl?`<span class="mob-chip" style="color:var(--green);border-color:#bbf0d3">${msvg.check} Proof ✓</span>`:'';
-  const actionBtn=o.status==='assigned'
-    ?`<button class="mob-btn mob-btn-reveal" onclick="acceptAssignment('${key}')">${msvg.eye} Reveal</button>`
-    :`<button class="mob-btn mob-btn-proof" onclick="openProofModal('${key}')">${msvg.camera} Proof</button>`;
-  return`<div class="mob-card" style="animation-delay:${idx*.05}s">
-    <div class="mob-card-head"><div><div class="mob-vendor-name">${vendor}</div><div class="mob-order-num">#${orderNum}</div></div><span class="mob-status-pill ${stCls}">${stLabel}</span></div>
-    <div class="mob-addr-row pickup">${msvg.store}<div><div class="mob-addr-lbl">① Pickup from</div><div class="mob-addr-val">${ra}</div></div></div>
-    ${addrBlock}
-    <div class="mob-card-foot">
-      <div class="mob-meta-row"><span class="mob-chip">${msvg.user} ${customer}</span><span class="mob-chip" style="color:var(--accent);border-color:rgba(255,117,31,.3)">R${Number(o.total||0).toFixed(2)}</span>${proofBadge}</div>
-      <div class="mob-btn-row">
-        <button class="mob-btn mob-btn-outline" onclick="viewOrderDetail('${key}')">${msvg.map}</button>
-        ${actionBtn}
-        <button class="mob-btn mob-btn-del" onclick="confirmDeleteOrder('${key}')">${msvg.trash}</button>
-      </div>
-    </div>
-  </div>`;
+async function seedCarousel() {
+  const updates = {};
+  SEED_CAROUSEL.forEach((slide, i) => {
+    const key = push(carouselRef).key;
+    updates[key] = { ...slide, order: i, createdAt: Date.now() };
+  });
+  await update(carouselRef, updates);
 }
 
-/* ─── PHOTO PROOF OF DELIVERY ────────────── */
-window.openProofModal=function(key){
-  proofOrderKey=key;
-  proofUploadedUrl=null;
-  const o=ordersCache[key];
-  // If already has proof, skip upload and just mark delivered
-  if(o&&o.deliveryProofUrl){
-    if(confirm('Proof already uploaded. Confirm delivery?')){markDeliveredWithProof(key,o.deliveryProofUrl);}
+function sortedEntries(cache) {
+  return Object.entries(cache).sort((a, b) => (a[1].order ?? 0) - (b[1].order ?? 0));
+}
+
+/* ──────────────────────────────────────────────────────────
+   SHOWS — RENDER
+─────────────────────────────────────────────────────────── */
+const showsList = document.getElementById('showsList');
+const showsCountEl = document.getElementById('showsCount');
+
+function renderShows() {
+  const entries = sortedEntries(showsCache);
+  showsCountEl.textContent = entries.length;
+
+  if (entries.length === 0) {
+    showsList.innerHTML = `
+      <div class="empty-state">
+        <h3>No shows yet</h3>
+        <p>Add your first show card — it'll appear on the homepage lineup.</p>
+      </div>`;
     return;
   }
-  // Reset modal
-  document.getElementById('proofPreviewImg').classList.remove('show');
-  document.getElementById('proofPreviewImg').src='';
-  document.getElementById('proofUploadPrompt').style.display='block';
-  document.getElementById('proofUploadArea').classList.remove('has-photo');
-  document.getElementById('proofUploading').classList.remove('show');
-  document.getElementById('proofSuccessBlock').style.display='none';
-  document.getElementById('confirmDeliveredBtn').disabled=true;
-  document.getElementById('proofFileInput').value='';
-  openModal('proofModal');
-};
 
-window.handleProofPhoto=async function(input){
-  if(!input.files||!input.files[0])return;
-  const file=input.files[0];
-  if(file.size>10*1024*1024){showToast('Photo too large — max 10MB','error');return;}
+  showsList.innerHTML = entries.map(([id, show]) => showRowTemplate(id, show)).join('');
 
-  // Show preview immediately
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=document.getElementById('proofPreviewImg');
-    img.src=e.target.result;
-    img.classList.add('show');
-    document.getElementById('proofUploadPrompt').style.display='none';
-  };
-  reader.readAsDataURL(file);
+  entries.forEach(([id, show]) => attachShowRowHandlers(id));
 
-  // Upload to Cloudinary
-  document.getElementById('proofUploading').classList.add('show');
-  document.getElementById('proofUploadArea').classList.remove('has-photo');
+  makeSortable(showsList, '.show-row', async (newOrderIds) => {
+    const updates = {};
+    newOrderIds.forEach((id, i) => { updates[`${id}/order`] = i; });
+    setSaveState('saving');
+    try {
+      await update(showsRef, updates);
+      setSaveState('synced');
+    } catch (err) {
+      setSaveState('error');
+      toast('Could not save new order: ' + err.message, 'error');
+    }
+  });
+}
 
-  try{
-    const fd=new FormData();
-    fd.append('file',file);
-    fd.append('upload_preset',CLOUDINARY_PRESET);
-    fd.append('folder','1busket_delivery_proofs');
+function showRowTemplate(id, show) {
+  const mode = show.mode || 'gradient';
+  const previewHtml = mode === 'image' && show.imageUrl
+    ? `<img src="${escapeHtml(show.imageUrl)}" alt="" />`
+    : `<div class="grad-fill" style="background:linear-gradient(145deg, ${show.gradA || '#222'} 0%, ${show.gradB || '#444'} 100%);">
+         <div class="gi">${escapeHtml(show.initials || '??')}</div>
+         <div class="gl">${escapeHtml(show.label || show.name || '')}</div>
+       </div>`;
 
-    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:fd});
-    const data=await res.json();
+  return `
+  <div class="show-row" data-id="${id}" draggable="true">
+    <div class="drag-handle" title="Drag to reorder">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>
+    </div>
 
-    if(data.secure_url){
-      proofUploadedUrl=data.secure_url;
-      document.getElementById('proofUploading').classList.remove('show');
-      document.getElementById('proofSuccessBlock').style.display='block';
-      document.getElementById('proofUploadArea').classList.add('has-photo');
-      document.getElementById('confirmDeliveredBtn').disabled=false;
-    }else{throw new Error('Upload failed');}
-  }catch(e){
-    document.getElementById('proofUploading').classList.remove('show');
-    showToast('Upload failed — try again','error');
-    document.getElementById('proofPreviewImg').classList.remove('show');
-    document.getElementById('proofUploadPrompt').style.display='block';
-    document.getElementById('proofFileInput').value='';
+    <div class="show-preview" data-role="preview">${previewHtml}</div>
+
+    <div class="show-fields">
+      <div class="field">
+        <label>Show name</label>
+        <input type="text" data-field="name" value="${escapeHtml(show.name || '')}" placeholder="e.g. Morning Pulse" />
+      </div>
+      <div class="field">
+        <label>Host(s)</label>
+        <input type="text" data-field="host" value="${escapeHtml(show.host || '')}" placeholder="e.g. The Morning Crew" />
+      </div>
+      <div class="field full">
+        <label>Time slot</label>
+        <input type="text" data-field="time" value="${escapeHtml(show.time || '')}" placeholder="e.g. Mon – Fri · 05:00 – 09:00" />
+      </div>
+
+      <div class="field full">
+        <label>Artwork</label>
+        <div class="mode-toggle" data-role="modeToggle">
+          <button type="button" data-mode="image" class="${mode === 'image' ? 'active' : ''}">Photo</button>
+          <button type="button" data-mode="gradient" class="${mode === 'gradient' ? 'active' : ''}">Gradient + Initials</button>
+        </div>
+      </div>
+
+      <div class="field full" data-role="imageBlock" style="${mode === 'image' ? '' : 'display:none;'}">
+        <div class="upload-row">
+          <div class="field" style="margin-bottom:0;">
+            <input type="file" accept="image/*" data-field="imageFile" />
+            <div class="upload-progress" data-role="progress"><div class="upload-progress-bar" data-role="progressBar"></div></div>
+            <div class="helper-text">Or paste an image URL below.</div>
+            <input type="text" data-field="imageUrl" value="${escapeHtml(show.imageUrl || '')}" placeholder="https://…" style="margin-top:8px;" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field full" data-role="gradientBlock" style="${mode === 'gradient' ? '' : 'display:none;'}">
+        <div class="gradient-row">
+          <div class="swatch-input">
+            <input type="color" data-field="gradA" value="${normalizeHex(show.gradA) || '#222222'}" />
+            <span class="helper-text">Color A</span>
+          </div>
+          <div class="swatch-input">
+            <input type="color" data-field="gradB" value="${normalizeHex(show.gradB) || '#444444'}" />
+            <span class="helper-text">Color B</span>
+          </div>
+          <div class="field" style="margin-bottom:0; width:90px;">
+            <label>Initials</label>
+            <input type="text" data-field="initials" maxlength="3" value="${escapeHtml(show.initials || '')}" placeholder="MP" />
+          </div>
+          <div class="field" style="margin-bottom:0; flex:1; min-width:140px;">
+            <label>Label text</label>
+            <input type="text" data-field="label" value="${escapeHtml(show.label || '')}" placeholder="Morning Pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-actions">
+      <button class="btn btn-gold btn-sm" data-role="save">Save</button>
+      <button class="btn btn-danger btn-sm" data-role="delete">Delete</button>
+    </div>
+  </div>`;
+}
+
+function normalizeHex(val) {
+  if (!val) return null;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) return val;
+  if (/^#[0-9a-fA-F]{3}$/.test(val)) {
+    return '#' + val.slice(1).split('').map(c => c + c).join('');
   }
-};
-
-window.submitProofAndDeliver=async function(){
-  if(!proofOrderKey||!proofUploadedUrl){showToast('Please upload a photo first','error');return;}
-  document.getElementById('confirmDeliveredBtn').disabled=true;
-  document.getElementById('confirmDeliveredBtn').innerHTML='<span style="opacity:.65">Confirming…</span>';
-  await markDeliveredWithProof(proofOrderKey,proofUploadedUrl);
-  hideModal('proofModal');
-};
-
-async function markDeliveredWithProof(key,photoUrl){
-  try{
-    await db.ref('orders/'+key).update({status:'delivered',deliveryProofUrl:photoUrl,deliveredAt:Date.now(),updatedAt:Date.now()});
-    showToast('Delivery confirmed with photo proof! 🎉','success');
-  }catch(e){showToast('Failed to confirm delivery','error');}
+  return null;
 }
 
-/* ─── HISTORY ────────────────────────────── */
-function updateHistoryTab(){
-  const entries=Object.entries(ordersCache);
-  const hist=entries.filter(([k,o])=>o.driverKey===DRIVER_KEY&&(o.status==='delivered'||o.status==='cancelled')).sort(([,a],[,b])=>(b.createdAt||0)-(a.createdAt||0));
-  const container=document.getElementById('orderHistoryList');if(!container)return;
-  if(!hist.length){container.innerHTML=`<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:8px">📋</div><div style="font-weight:700;margin-bottom:4px">No completed orders yet</div><div style="font-size:.82rem">Delivered orders will appear here</div></div>`;return;}
-  container.innerHTML=hist.map(([key,o])=>{
-    const date=new Date(o.createdAt||Date.now());
-    const dateStr=date.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
-    const timeStr=date.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
-    const earn=(Number(o.total||0)*0.15).toFixed(2);
-    const sc=o.status==='delivered'?'pill-green':'pill-red';
-    const sl=o.status==='delivered'?'✓ Delivered':'✗ Cancelled';
-    const addr=getCustomerAddr(o)||'Customer address';
-    const customer=getCustomerName(o);
-    const proofBtn=o.deliveryProofUrl?`<a href="${o.deliveryProofUrl}" target="_blank" class="btn btn-success" style="margin-top:6px;padding:5px 12px;font-size:.7rem"><i data-lucide="camera" style="width:12px;height:12px"></i> View Proof</a>`:'';
-    return`<div class="history-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><strong>${o.vendorName||'Restaurant'}</strong><span class="order-meta-pill ${sc}">${sl}</span><span class="customer-name-badge"><i data-lucide="user" style="width:12px;height:12px"></i> ${customer}</span></div><div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><i data-lucide="map-pin" style="width:13px;height:13px;color:var(--accent);flex-shrink:0"></i><span style="font-size:.78rem;color:var(--dim)">${addr}</span></div><div style="font-size:.75rem;color:var(--dim)">${dateStr} · ${timeStr}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:1.1rem;font-weight:800;color:var(--text)">R${Number(o.total||0).toFixed(2)}</div><div style="font-size:.75rem;color:var(--green);font-weight:700">+R${earn} earned</div>${proofBtn}<button onclick="confirmDeleteOrder('${key}')" class="btn btn-danger" style="margin-top:6px;padding:5px 12px;font-size:.7rem"><i data-lucide="trash-2" style="width:12px;height:12px"></i> Delete</button></div></div></div>`;
-  }).join('');
-  lucide.createIcons();
-}
+function attachShowRowHandlers(id) {
+  const row = showsList.querySelector(`.show-row[data-id="${id}"]`);
+  if (!row) return;
 
-/* ─── EARNINGS ───────────────────────────── */
-function updateEarningsTab(){
-  const orders=Object.values(ordersCache).filter(o=>o.driverKey===DRIVER_KEY&&o.status==='delivered');
-  const now=new Date();const todayStr=now.toDateString();
-  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
-  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
-  const todayE=orders.filter(o=>new Date(o.createdAt).toDateString()===todayStr).reduce((s,o)=>s+Number(o.total||0)*0.15,0);
-  const weekE=orders.filter(o=>new Date(o.createdAt)>=weekStart).reduce((s,o)=>s+Number(o.total||0)*0.15,0);
-  const monthE=orders.filter(o=>new Date(o.createdAt)>=monthStart).reduce((s,o)=>s+Number(o.total||0)*0.15,0);
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('earningsToday','R '+todayE.toFixed(2));set('earningsWeek','R '+weekE.toFixed(2));set('earningsMonth','R '+monthE.toFixed(2));set('totalDelivered',orders.length);
-}
+  const modeToggle = row.querySelector('[data-role="modeToggle"]');
+  const imageBlock = row.querySelector('[data-role="imageBlock"]');
+  const gradientBlock = row.querySelector('[data-role="gradientBlock"]');
+  const previewEl = row.querySelector('[data-role="preview"]');
+  let pendingMode = (showsCache[id]?.mode) || 'gradient';
+  let pendingImageUrl = showsCache[id]?.imageUrl || '';
 
-/* ─── LEADERBOARD ────────────────────────── */
-const PROVINCES=['All Provinces','Limpopo','Gauteng','Western Cape','KwaZulu-Natal','Eastern Cape','Mpumalanga','North West','Free State','Northern Cape'];
+  function refreshPreview() {
+    const name = row.querySelector('[data-field="name"]').value;
+    const initials = row.querySelector('[data-field="initials"]')?.value || '';
+    const label = row.querySelector('[data-field="label"]')?.value || name;
+    const gradA = row.querySelector('[data-field="gradA"]')?.value || '#222222';
+    const gradB = row.querySelector('[data-field="gradB"]')?.value || '#444444';
 
-function buildLeaderboardProvinces(){
-  const filter=document.getElementById('provinceFilter');
-  if(!filter)return;
-  filter.innerHTML=PROVINCES.map((p,i)=>`<button class="province-chip${i===0?' active':''}" onclick="filterLeaderboard('${p}',this)">${p}</button>`).join('');
-}
+    if (pendingMode === 'image' && pendingImageUrl) {
+      previewEl.innerHTML = `<img src="${escapeHtml(pendingImageUrl)}" alt="" />`;
+    } else {
+      previewEl.innerHTML = `<div class="grad-fill" style="background:linear-gradient(145deg, ${gradA} 0%, ${gradB} 100%);">
+        <div class="gi">${escapeHtml(initials || '??')}</div>
+        <div class="gl">${escapeHtml(label || '')}</div>
+      </div>`;
+    }
+  }
 
-window.filterLeaderboard=function(province,el){
-  selectedProvince=province==='All Provinces'?'':province;
-  document.querySelectorAll('.province-chip').forEach(c=>c.classList.remove('active'));
-  if(el)el.classList.add('active');
-  renderLeaderboard();
-};
-
-async function renderLeaderboard(){
-  const container=document.getElementById('leaderboardList');
-  if(!container)return;
-
-  // Get all drivers from Firebase
-  let driversSnap;
-  if(!isOnline){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">📡</div><div style="font-weight:700">Offline — leaderboard unavailable</div></div>`;return;}
-  try{driversSnap=await db.ref('drivers').orderByChild('status').equalTo('active').once('value');}
-  catch(e){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">⚠️</div><div style="font-weight:700">Could not load leaderboard</div></div>`;return;}
-
-  const driversRaw=driversSnap.val()||{};
-  const orders=Object.values(ordersCache);
-  const now=new Date();
-  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
-
-  // Build driver scores
-  let board=Object.entries(driversRaw).map(([key,d])=>{
-    const myOrders=orders.filter(o=>o.driverKey===key&&o.status==='delivered'&&new Date(o.createdAt)>=monthStart);
-    const deliveries=myOrders.length;
-    const earnings=myOrders.reduce((s,o)=>s+Number(o.total||0)*0.15,0);
-    return{key,name:getDriverFullName(d),province:d.province||'',rating:d.rating||5.0,deliveries,earnings,isMe:key===DRIVER_KEY};
+  modeToggle.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pendingMode = btn.dataset.mode;
+      modeToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      imageBlock.style.display = pendingMode === 'image' ? '' : 'none';
+      gradientBlock.style.display = pendingMode === 'gradient' ? '' : 'none';
+      refreshPreview();
+    });
   });
 
-  // Filter by province
-  if(selectedProvince)board=board.filter(d=>d.province===selectedProvince);
+  row.querySelectorAll('[data-field]').forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.dataset.field === 'imageUrl') pendingImageUrl = input.value;
+      refreshPreview();
+    });
+  });
 
-  // Sort by deliveries desc, then earnings
-  board.sort((a,b)=>b.deliveries-a.deliveries||b.earnings-a.earnings);
+  const fileInput = row.querySelector('[data-field="imageFile"]');
+  const progressWrap = row.querySelector('[data-role="progress"]');
+  const progressBar = row.querySelector('[data-role="progressBar"]');
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    progressWrap.classList.add('active');
+    progressBar.style.width = '0%';
+    try {
+      const url = await uploadToCloudinary(file, (pct) => { progressBar.style.width = pct + '%'; });
+      pendingImageUrl = url;
+      row.querySelector('[data-field="imageUrl"]').value = url;
+      refreshPreview();
+      toast('Image uploaded — click Save to apply');
+    } catch (err) {
+      toast('Upload failed: ' + err.message, 'error');
+    } finally {
+      setTimeout(() => progressWrap.classList.remove('active'), 500);
+    }
+  });
 
-  // Top 10
-  board=board.slice(0,10);
+  row.querySelector('[data-role="save"]').addEventListener('click', async () => {
+    const payload = {
+      name: row.querySelector('[data-field="name"]').value.trim(),
+      host: row.querySelector('[data-field="host"]').value.trim(),
+      time: row.querySelector('[data-field="time"]').value.trim(),
+      mode: pendingMode,
+      imageUrl: row.querySelector('[data-field="imageUrl"]').value.trim(),
+      gradA: row.querySelector('[data-field="gradA"]').value,
+      gradB: row.querySelector('[data-field="gradB"]').value,
+      initials: row.querySelector('[data-field="initials"]').value.trim(),
+      label: row.querySelector('[data-field="label"]').value.trim(),
+      updatedAt: Date.now()
+    };
+    if (!payload.name) { toast('Show name is required', 'error'); return; }
 
-  if(!board.length){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">🏆</div><div style="font-weight:700">No drivers in ${selectedProvince||'this area'} yet</div></div>`;return;}
+    setSaveState('saving');
+    try {
+      await update(ref(db, `shows/${id}`), payload);
+      setSaveState('synced');
+      toast(`"${payload.name}" saved`);
+    } catch (err) {
+      setSaveState('error');
+      toast('Save failed: ' + err.message, 'error');
+    }
+  });
 
-  const trophies=['🥇','🥈','🥉'];
-  container.innerHTML=board.map((d,i)=>{
-    const rank=i+1;
-    const rankCls=rank<=3?`rank-${rank}`:'';
-    const rankDot=rank<=3?trophies[i]:`#${rank}`;
-    const rankEl=rank<=3?`<div class="leaderboard-trophy">${trophies[i]}</div>`:`<div class="leaderboard-rank leaderboard-rank-default">#${rank}</div>`;
-    const meBadge=d.isMe?`<span class="you-badge">YOU</span>`:'';
-    const init=d.name.charAt(0).toUpperCase();
-    return`<div class="leaderboard-row ${rankCls}${d.isMe?' is-me':''}">
-      ${rankEl}
-      <div class="leaderboard-avatar">${init}</div>
-      <div class="leaderboard-info">
-        <div class="leaderboard-name">${d.name}${meBadge}</div>
-        <div class="leaderboard-sub">${d.province||'SA'} · ★ ${Number(d.rating).toFixed(1)}</div>
+  row.querySelector('[data-role="delete"]').addEventListener('click', async () => {
+    const name = showsCache[id]?.name || 'this show';
+    const ok = await askConfirm('Delete this show?', `"${name}" will be removed from the homepage lineup. This can't be undone.`);
+    if (!ok) return;
+    try {
+      await remove(ref(db, `shows/${id}`));
+      toast(`"${name}" deleted`);
+    } catch (err) {
+      toast('Delete failed: ' + err.message, 'error');
+    }
+  });
+}
+
+document.getElementById('addShowBtn').addEventListener('click', async () => {
+  const entries = sortedEntries(showsCache);
+  const newShow = {
+    name: 'New Show',
+    time: 'Mon – Fri · 00:00 – 00:00',
+    host: 'Host Name',
+    mode: 'gradient',
+    gradA: '#222222',
+    gradB: '#444444',
+    initials: 'NS',
+    label: 'New Show',
+    imageUrl: '',
+    order: entries.length,
+    createdAt: Date.now()
+  };
+  try {
+    await push(showsRef, newShow);
+    toast('New show card added — edit it below');
+  } catch (err) {
+    toast('Could not add show: ' + err.message, 'error');
+  }
+});
+
+/* ──────────────────────────────────────────────────────────
+   CAROUSEL — RENDER
+─────────────────────────────────────────────────────────── */
+const carouselGrid = document.getElementById('carouselGrid');
+const carouselCountEl = document.getElementById('carouselCount');
+
+function renderCarousel() {
+  const entries = sortedEntries(carouselCache);
+  carouselCountEl.textContent = entries.length;
+
+  let html = entries.map(([id, slide], i) => slideCardTemplate(id, slide, i)).join('');
+  html += `<button class="add-card-btn" id="addSlideBtn">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    Add a slide
+  </button>`;
+
+  carouselGrid.innerHTML = html;
+
+  entries.forEach(([id]) => attachSlideHandlers(id));
+  document.getElementById('addSlideBtn').addEventListener('click', addSlide);
+
+  makeSortable(carouselGrid, '.slide-card', async (newOrderIds) => {
+    const updates = {};
+    newOrderIds.forEach((id, i) => { updates[`${id}/order`] = i; });
+    setSaveState('saving');
+    try {
+      await update(carouselRef, updates);
+      setSaveState('synced');
+    } catch (err) {
+      setSaveState('error');
+      toast('Could not save new order: ' + err.message, 'error');
+    }
+  });
+}
+
+function slideCardTemplate(id, slide, index) {
+  return `
+  <div class="slide-card" data-id="${id}" draggable="true">
+    <div class="slide-img-wrap">
+      <img src="${escapeHtml(slide.imageUrl || '')}" alt="${escapeHtml(slide.alt || '')}" data-role="img" />
+      <div class="slide-drag-handle" title="Drag to reorder">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>
       </div>
-      <div class="leaderboard-score">
-        <div class="leaderboard-deliveries">${d.deliveries} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">del.</span></div>
-        <div class="leaderboard-earn">+R${d.earnings.toFixed(0)}</div>
+      <div class="slide-order-badge">#${index + 1}</div>
+    </div>
+    <div class="slide-body">
+      <div class="field" style="margin-bottom:0;">
+        <label>Replace image</label>
+        <input type="file" accept="image/*" data-field="imageFile" />
+        <div class="upload-progress" data-role="progress"><div class="upload-progress-bar" data-role="progressBar"></div></div>
       </div>
-    </div>`;
-  }).join('');
+      <div class="field" style="margin-bottom:0;">
+        <label>Alt text</label>
+        <input type="text" data-field="alt" value="${escapeHtml(slide.alt || '')}" placeholder="Describe the photo" />
+      </div>
+      <div class="slide-actions">
+        <button class="btn btn-gold btn-sm" data-role="save">Save</button>
+        <button class="btn btn-danger btn-sm" data-role="delete">Delete</button>
+      </div>
+    </div>
+  </div>`;
 }
 
-/* ─── ACTIONS ────────────────────────────── */
-window.acceptDelivery=function(key){
-  if(!DRIVER_KEY||!driverData)return;
-  if(isBusy){showToast('You\'re in busy mode — go online first','error');return;}
-  db.ref('orders/'+key).transaction(cur=>{if(!cur||cur.driverKey)return;cur.driverKey=DRIVER_KEY;cur.driverName=getDriverFullName(driverData);cur.status='out_for_delivery';cur.updatedAt=Date.now();return cur;}).then(r=>{if(r.committed)showToast('Delivery accepted! 🛵 Customer address now visible.','success');else showToast('Order already taken by another driver');}).catch(()=>showToast('Failed to accept order'));
-};
-window.acceptAssignment=function(key){if(!DRIVER_KEY)return;db.ref('orders/'+key).update({status:'out_for_delivery',updatedAt:Date.now()}).then(()=>showToast('Order accepted! Customer address is now visible.','success')).catch(()=>showToast('Failed to accept assignment'));};
-window.markDelivered=function(key){db.ref('orders/'+key).update({status:'delivered',updatedAt:Date.now()}).then(()=>showToast('Order delivered! 🎉','success'));};
-window.confirmDeleteOrder=function(key){
-  pendingDeleteKey=key;openModal('deleteConfirmModal');
-  document.getElementById('confirmDeleteBtn').onclick=function(){if(pendingDeleteKey){db.ref('orders/'+pendingDeleteKey).remove().then(()=>{showToast('Order deleted','success');hideModal('deleteConfirmModal');pendingDeleteKey=null;}).catch(()=>{showToast('Failed to delete order');hideModal('deleteConfirmModal');});}};
-};
-window.saveDriverProfile=function(){
-  if(!DRIVER_KEY)return;
-  const name=document.getElementById('p-fullname').value.trim();
-  if(!name){showToast('Please enter your full name');return;}
-  const updates={name,firstName:name.split(' ')[0]||'',lastName:name.split(' ').slice(1).join(' ')||'',vehicleType:document.getElementById('p-vehicle').value,licenseNumber:document.getElementById('p-license').value,phone:document.getElementById('p-phone').value,email:document.getElementById('p-email').value,emergencyContact:document.getElementById('p-emergency').value,bankDetails:document.getElementById('p-bank').value,updatedAt:Date.now()};
-  db.ref('drivers/'+DRIVER_KEY).update(updates).then(()=>{showToast('Profile saved! ✓','success');if(driverData)Object.assign(driverData,updates);applyDriverUI();}).catch(()=>showToast('Failed to save'));
-};
-window.toggleSetting=function(el,key){el.classList.toggle('on');if(DRIVER_KEY)db.ref('drivers/'+DRIVER_KEY+'/settings/'+key).set(el.classList.contains('on'));};
+function attachSlideHandlers(id) {
+  const card = carouselGrid.querySelector(`.slide-card[data-id="${id}"]`);
+  if (!card) return;
 
-/* ─── ORDER DETAIL MODAL WITH MAP ─────────── */
-window.viewOrderDetail=function(key){
-  const o=ordersCache[key];if(!o)return;
-  const orderNum=o.orderNumber||key.slice(-6);
-  const items=o.items||[];const total=Number(o.total||0).toFixed(2);
-  const customer=getCustomerName(o);
-  const isMyDel=(o.driverKey===DRIVER_KEY&&(o.status==='assigned'||o.status==='out_for_delivery'));
-  const ra=getRestaurantAddrSync(o)||'Restaurant pickup location';
-  const ca=getCustomerAddr(o);
-  const proofSection=o.deliveryProofUrl?`<div class="order-detail-section"><h4>📸 Delivery Proof</h4><img src="${o.deliveryProofUrl}" style="width:100%;border-radius:14px;object-fit:cover;max-height:200px;border:1px solid var(--border)"></div>`:'';
-  let addrHTML=isMyDel
-    ?`<div class="order-detail-section"><h4>① Pickup — Restaurant Location</h4><div class="addr-display pickup"><i data-lucide="store" style="width:18px;height:18px;color:#1a7a4a;flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:#1a7a4a;margin-bottom:3px">Go here first to collect the order</div><div style="font-weight:700;color:#14532d">${ra}</div></div></div></div><div class="order-detail-section"><h4>② Deliver — Customer Address</h4><div class="addr-display delivery"><i data-lucide="map-pin" style="width:18px;height:18px;color:var(--accent);flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:3px">Deliver here</div><div style="font-weight:700;color:var(--text)">${ca||'Address not provided'}</div></div></div></div>`
-    :`<div class="order-detail-section"><h4>Restaurant Pickup Location</h4><div class="addr-display pickup"><i data-lucide="store" style="width:18px;height:18px;color:#1a7a4a;flex-shrink:0"></i><div><div style="font-size:.72rem;font-weight:700;color:#1a7a4a;margin-bottom:3px">Go here to collect the order</div><div style="font-weight:700;color:#14532d">${ra}</div></div></div></div><div class="order-detail-section"><h4>Customer Delivery Address</h4><div class="addr-display locked"><i data-lucide="lock" style="width:18px;height:18px;color:#92400e;flex-shrink:0"></i><div style="color:#92400e;font-size:.84rem;font-weight:600">Accept this order to reveal the customer's delivery address</div></div></div>`;
-  const navTarget=isMyDel?(ca||ra):ra;
-  const navLabel=isMyDel?'Navigate to Customer':'Navigate to Restaurant';
-  const itemsHTML=items.map(it=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.85rem"><span>${it.name} ×${it.quantity||1}</span><span style="font-weight:700">R${(Number(it.price||0)*(it.quantity||1)).toFixed(2)}</span></div>`).join('');
-  document.getElementById('orderDetailTitle').textContent=`Order #${orderNum}`;
-  document.getElementById('orderDetailBody').innerHTML=`
-    <div class="order-detail-section"><h4>Customer</h4><div class="addr-display"><i data-lucide="user" style="width:18px;height:18px"></i><strong>${customer}</strong></div></div>
-    ${addrHTML}
-    ${proofSection}
-    <div class="order-detail-section"><h4>Order Items</h4>${itemsHTML||'<p style="color:var(--dim);font-size:.85rem">No items listed</p>'}<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:800;font-size:.95rem"><span>Total</span><span style="color:var(--accent)">R${total}</span></div></div>
-    <div class="order-detail-section"><h4>Directions Map</h4><div class="map-container"><div id="orderMap"></div></div><div style="margin-top:10px;display:flex;gap:10px">
-      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent('${(navTarget||'').replace(/'/g,"\\'")}'),'_blank')" class="btn-primary" style="flex:1;justify-content:center;padding:10px;font-size:.82rem"><i data-lucide="navigation" style="width:14px;height:14px"></i> ${navLabel}</button>
-      ${isMyDel&&o.status==='out_for_delivery'?`<button onclick="hideModal('orderDetailModal');openProofModal('${key}')" class="btn btn-success" style="padding:10px 16px;font-size:.82rem"><i data-lucide="camera" style="width:14px;height:14px"></i> Add Proof</button>`:''}
-    </div></div>`;
-  openModal('orderDetailModal');lucide.createIcons();
-  setTimeout(()=>{
-    if(currentMapInstance){currentMapInstance.remove();currentMapInstance=null;}
-    try{
-      const map=new mapboxgl.Map({container:'orderMap',style:'mapbox://styles/mapbox/streets-v12',center:[28.4,-25.7],zoom:11});
-      currentMapInstance=map;map.on('load',()=>map.resize());
-      if(o.vendorLat&&o.vendorLng){const vl=[parseFloat(o.vendorLng),parseFloat(o.vendorLat)];new mapboxgl.Marker({color:'#1a7a4a'}).setLngLat(vl).setPopup(new mapboxgl.Popup().setHTML(`<strong>🏪 ${o.vendorName||'Restaurant'}</strong><br>${ra}`)).addTo(map);map.setCenter(vl);}
-      else if(ra&&ra!=='Restaurant pickup location'){geocode(ra).then(geo=>{if(geo&&currentMapInstance){new mapboxgl.Marker({color:'#1a7a4a'}).setLngLat([geo.lng,geo.lat]).addTo(currentMapInstance);currentMapInstance.setCenter([geo.lng,geo.lat]);}});}
-      if(isMyDel&&ca){geocode(ca).then(geo=>{if(!geo||!currentMapInstance)return;new mapboxgl.Marker({color:'#ff751f'}).setLngLat([geo.lng,geo.lat]).addTo(currentMapInstance);const vll=[parseFloat(o.vendorLng||0),parseFloat(o.vendorLat||0)];if(o.vendorLat&&o.vendorLng){fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${vll[0]},${vll[1]};${geo.lng},${geo.lat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`).then(r=>r.json()).then(rd=>{if(!currentMapInstance||!rd.routes||!rd.routes.length)return;if(currentMapInstance.getSource('route'))currentMapInstance.getSource('route').setData({type:'Feature',properties:{},geometry:rd.routes[0].geometry});else{currentMapInstance.addSource('route',{type:'geojson',data:{type:'Feature',properties:{},geometry:rd.routes[0].geometry}});currentMapInstance.addLayer({id:'route',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#ff751f','line-width':4,'line-opacity':.8}});}const bounds=new mapboxgl.LngLatBounds().extend(vll).extend([geo.lng,geo.lat]);currentMapInstance.fitBounds(bounds,{padding:40});});}else currentMapInstance.setCenter([geo.lng,geo.lat]);});}
-    }catch(e){console.error('Map error:',e);}
-  },300);
-};
+  let pendingImageUrl = carouselCache[id]?.imageUrl || '';
 
-/* ─── NAVIGATION ─────────────────────────── */
-function showTab(id,el){
-  document.querySelectorAll('#driverMainPanel .page-content').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('#driverSidebar .nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(el)el.classList.add('active');
-  if(id==='leaderboard')renderLeaderboard();
-  lucide.createIcons();
-}
-function mobileTab(pageId,btnId){
-  document.querySelectorAll('#driverMainPanel .page-content').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
-  const page=document.getElementById(pageId);if(page)page.classList.add('active');
-  const btn=document.getElementById(btnId);if(btn)btn.classList.add('active');
-  if(pageId==='leaderboard')renderLeaderboard();
-  window.scrollTo({top:0,behavior:'smooth'});
+  const fileInput = card.querySelector('[data-field="imageFile"]');
+  const progressWrap = card.querySelector('[data-role="progress"]');
+  const progressBar = card.querySelector('[data-role="progressBar"]');
+  const imgEl = card.querySelector('[data-role="img"]');
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    progressWrap.classList.add('active');
+    progressBar.style.width = '0%';
+    try {
+      const url = await uploadToCloudinary(file, (pct) => { progressBar.style.width = pct + '%'; });
+      pendingImageUrl = url;
+      imgEl.src = url;
+      toast('Image uploaded — click Save to apply');
+    } catch (err) {
+      toast('Upload failed: ' + err.message, 'error');
+    } finally {
+      setTimeout(() => progressWrap.classList.remove('active'), 500);
+    }
+  });
+
+  card.querySelector('[data-role="save"]').addEventListener('click', async () => {
+    const alt = card.querySelector('[data-field="alt"]').value.trim();
+    if (!pendingImageUrl) { toast('Please upload an image first', 'error'); return; }
+    setSaveState('saving');
+    try {
+      await update(ref(db, `carousel/${id}`), { imageUrl: pendingImageUrl, alt, updatedAt: Date.now() });
+      setSaveState('synced');
+      toast('Slide saved');
+    } catch (err) {
+      setSaveState('error');
+      toast('Save failed: ' + err.message, 'error');
+    }
+  });
+
+  card.querySelector('[data-role="delete"]').addEventListener('click', async () => {
+    const ok = await askConfirm('Delete this slide?', "It will be removed from the homepage carousel. This can't be undone.");
+    if (!ok) return;
+    try {
+      await remove(ref(db, `carousel/${id}`));
+      toast('Slide deleted');
+    } catch (err) {
+      toast('Delete failed: ' + err.message, 'error');
+    }
+  });
 }
 
-/* ─── MODALS ─────────────────────────────── */
-function openModal(id){const el=document.getElementById(id);el.style.display='flex';setTimeout(()=>{el.classList.add('active');lucide.createIcons();},10);}
-function hideModal(id){const el=document.getElementById(id);el.classList.remove('active');setTimeout(()=>el.style.display='none',350);}
-
-function confirmLogout(){
-  locBannerShown=false;
-  localStorage.removeItem('1busket_driver_session');
-  if(locationWatcher){navigator.geolocation.clearWatch(locationWatcher);locationWatcher=null;}
-  if(DRIVER_KEY&&isOnline)db.ref('drivers/'+DRIVER_KEY).update({isBusy:false,lastSeen:Date.now()});
-  hideModal('logoutModal');
-  window.location.href='login.html';
+async function addSlide() {
+  const entries = sortedEntries(carouselCache);
+  const newSlide = {
+    imageUrl: '',
+    alt: '',
+    order: entries.length,
+    createdAt: Date.now()
+  };
+  try {
+    await push(carouselRef, newSlide);
+    toast('New slide added — upload an image below');
+  } catch (err) {
+    toast('Could not add slide: ' + err.message, 'error');
+  }
 }
-
-/* ─── TOAST ──────────────────────────────── */
-function showToast(msg,type='success'){
-  const t=document.getElementById('toast');
-  document.getElementById('toastMsg').textContent=msg;
-  t.className='toast show'+(type==='success'?' success':type==='error'?' error':'');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show','success','error'),2800);
-}
-
-/* ─── SIDEBAR HOVER ──────────────────────── */
-const sidebar=document.getElementById('driverSidebar');
-if(sidebar){
-  sidebar.addEventListener('mouseenter',()=>{sidebar.classList.add('expanded');document.getElementById('driverMainPanel').classList.add('shifted');});
-  sidebar.addEventListener('mouseleave',()=>{sidebar.classList.remove('expanded');document.getElementById('driverMainPanel').classList.remove('shifted');});
-}
-
-initPortal();
-lucide.createIcons();
 </script>
 </body>
 </html>
