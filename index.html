@@ -645,6 +645,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="shows">Daily Lineup <span class="count" id="showsCount">0</span></button>
       <button class="tab-btn" data-tab="carousel">Photo Carousel <span class="count" id="carouselCount">0</span></button>
+      <button class="tab-btn" data-tab="news">News <span class="count" id="newsCount">0</span></button>
     </div>
 
     <!-- SHOWS TAB -->
@@ -670,6 +671,20 @@
         </div>
       </div>
       <div class="carousel-grid" id="carouselGrid"></div>
+    </section>
+
+    <!-- NEWS TAB -->
+    <section class="tab-panel" id="tab-news">
+      <div class="panel-head">
+        <div>
+          <h1>News</h1>
+          <p>Post news updates for the homepage. The News section stays hidden on the public site until at least one item is published here.</p>
+        </div>
+      </div>
+      <div class="item-list" id="newsList"></div>
+      <div style="margin-top:14px;">
+        <button class="add-show-row" id="addNewsBtn">+ Add a news item</button>
+      </div>
     </section>
   </main>
 </div>
@@ -804,7 +819,7 @@ function friendlyAuthError(code) {
 
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-let unsubShows = null, unsubCarousel = null;
+let unsubShows = null, unsubCarousel = null, unsubNews = null;
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -821,6 +836,7 @@ onAuthStateChanged(auth, (user) => {
     loginScreen.style.display = 'flex';
     if (unsubShows) { unsubShows(); unsubShows = null; }
     if (unsubCarousel) { unsubCarousel(); unsubCarousel = null; }
+    if (unsubNews) { unsubNews(); unsubNews = null; }
   }
 });
 
@@ -981,12 +997,15 @@ function makeSortable(container, itemSelector, onReorder) {
 ─────────────────────────────────────────────────────────── */
 const showsRef = ref(db, 'shows');
 const carouselRef = ref(db, 'carousel');
+const newsRef = ref(db, 'news');
 let showsCache = {};
 let carouselCache = {};
+let newsCache = {};
 
 function initData() {
   if (unsubShows) unsubShows();
   if (unsubCarousel) unsubCarousel();
+  if (unsubNews) unsubNews();
 
   unsubShows = onValue(showsRef, async (snap) => {
     const val = snap.val();
@@ -1008,6 +1027,11 @@ function initData() {
     carouselCache = val;
     renderCarousel();
   }, (err) => { console.error(err); toast('Could not load carousel: ' + err.message, 'error'); });
+
+  unsubNews = onValue(newsRef, (snap) => {
+    newsCache = snap.val() || {};
+    renderNews();
+  }, (err) => { console.error(err); toast('Could not load news: ' + err.message, 'error'); });
 }
 
 async function seedShows() {
@@ -1417,6 +1441,196 @@ async function addSlide() {
     toast('Could not add slide: ' + err.message, 'error');
   }
 }
+
+/* ──────────────────────────────────────────────────────────
+   NEWS — RENDER
+   Note: news intentionally has NO seed data. If empty, the
+   public site hides the News section entirely.
+─────────────────────────────────────────────────────────── */
+const newsList = document.getElementById('newsList');
+const newsCountEl = document.getElementById('newsCount');
+
+function renderNews() {
+  const entries = sortedEntries(newsCache);
+  newsCountEl.textContent = entries.length;
+
+  if (entries.length === 0) {
+    newsList.innerHTML = `
+      <div class="empty-state">
+        <h3>No news posted yet</h3>
+        <p>The News section is hidden on the homepage until you publish your first item here.</p>
+      </div>`;
+    return;
+  }
+
+  newsList.innerHTML = entries.map(([id, item]) => newsRowTemplate(id, item)).join('');
+
+  entries.forEach(([id]) => attachNewsRowHandlers(id));
+
+  makeSortable(newsList, '.show-row', async (newOrderIds) => {
+    const updates = {};
+    newOrderIds.forEach((id, i) => { updates[`${id}/order`] = i; });
+    setSaveState('saving');
+    try {
+      await update(newsRef, updates);
+      setSaveState('synced');
+    } catch (err) {
+      setSaveState('error');
+      toast('Could not save new order: ' + err.message, 'error');
+    }
+  });
+}
+
+function newsRowTemplate(id, item) {
+  const previewHtml = item.imageUrl
+    ? `<img src="${escapeHtml(item.imageUrl)}" alt="" />`
+    : `<div class="grad-fill" style="background:linear-gradient(145deg, #222222 0%, #444444 100%);">
+         <div class="gl">No image</div>
+       </div>`;
+
+  return `
+  <div class="show-row" data-id="${id}" draggable="true">
+    <div class="drag-handle" title="Drag to reorder">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>
+    </div>
+
+    <div class="show-preview" data-role="preview">${previewHtml}</div>
+
+    <div class="show-fields">
+      <div class="field full">
+        <label>Headline</label>
+        <input type="text" data-field="title" value="${escapeHtml(item.title || '')}" placeholder="e.g. Mokopane FM Launches New Morning Show" />
+      </div>
+      <div class="field full">
+        <label>Body text</label>
+        <textarea data-field="body" placeholder="Write the news update…">${escapeHtml(item.body || '')}</textarea>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" data-field="date" value="${escapeHtml(item.date || '')}" />
+      </div>
+      <div class="field">
+        <label>Link (optional)</label>
+        <input type="text" data-field="link" value="${escapeHtml(item.link || '')}" placeholder="https://…" />
+      </div>
+
+      <div class="field full">
+        <label>Image (optional)</label>
+        <div class="upload-row">
+          <div class="field" style="margin-bottom:0;">
+            <input type="file" accept="image/*" data-field="imageFile" />
+            <div class="upload-progress" data-role="progress"><div class="upload-progress-bar" data-role="progressBar"></div></div>
+            <div class="helper-text">Or paste an image URL below.</div>
+            <input type="text" data-field="imageUrl" value="${escapeHtml(item.imageUrl || '')}" placeholder="https://…" style="margin-top:8px;" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-actions">
+      <button class="btn btn-gold btn-sm" data-role="save">Save</button>
+      <button class="btn btn-danger btn-sm" data-role="delete">Delete</button>
+    </div>
+  </div>`;
+}
+
+function attachNewsRowHandlers(id) {
+  const row = newsList.querySelector(`.show-row[data-id="${id}"]`);
+  if (!row) return;
+
+  let pendingImageUrl = newsCache[id]?.imageUrl || '';
+  const previewEl = row.querySelector('[data-role="preview"]');
+
+  function refreshPreview() {
+    if (pendingImageUrl) {
+      previewEl.innerHTML = `<img src="${escapeHtml(pendingImageUrl)}" alt="" />`;
+    } else {
+      previewEl.innerHTML = `<div class="grad-fill" style="background:linear-gradient(145deg, #222222 0%, #444444 100%);">
+        <div class="gl">No image</div>
+      </div>`;
+    }
+  }
+
+  row.querySelectorAll('[data-field]').forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.dataset.field === 'imageUrl') { pendingImageUrl = input.value; refreshPreview(); }
+    });
+  });
+
+  const fileInput = row.querySelector('[data-field="imageFile"]');
+  const progressWrap = row.querySelector('[data-role="progress"]');
+  const progressBar = row.querySelector('[data-role="progressBar"]');
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    progressWrap.classList.add('active');
+    progressBar.style.width = '0%';
+    try {
+      const url = await uploadToCloudinary(file, (pct) => { progressBar.style.width = pct + '%'; });
+      pendingImageUrl = url;
+      row.querySelector('[data-field="imageUrl"]').value = url;
+      refreshPreview();
+      toast('Image uploaded — click Save to apply');
+    } catch (err) {
+      toast('Upload failed: ' + err.message, 'error');
+    } finally {
+      setTimeout(() => progressWrap.classList.remove('active'), 500);
+    }
+  });
+
+  row.querySelector('[data-role="save"]').addEventListener('click', async () => {
+    const payload = {
+      title: row.querySelector('[data-field="title"]').value.trim(),
+      body: row.querySelector('[data-field="body"]').value.trim(),
+      date: row.querySelector('[data-field="date"]').value.trim(),
+      link: row.querySelector('[data-field="link"]').value.trim(),
+      imageUrl: row.querySelector('[data-field="imageUrl"]').value.trim(),
+      updatedAt: Date.now()
+    };
+    if (!payload.title) { toast('Headline is required', 'error'); return; }
+
+    setSaveState('saving');
+    try {
+      await update(ref(db, `news/${id}`), payload);
+      setSaveState('synced');
+      toast(`"${payload.title}" saved`);
+    } catch (err) {
+      setSaveState('error');
+      toast('Save failed: ' + err.message, 'error');
+    }
+  });
+
+  row.querySelector('[data-role="delete"]').addEventListener('click', async () => {
+    const title = newsCache[id]?.title || 'this news item';
+    const ok = await askConfirm('Delete this news item?', `"${title}" will be removed from the homepage. This can't be undone.`);
+    if (!ok) return;
+    try {
+      await remove(ref(db, `news/${id}`));
+      toast(`"${title}" deleted`);
+    } catch (err) {
+      toast('Delete failed: ' + err.message, 'error');
+    }
+  });
+}
+
+document.getElementById('addNewsBtn').addEventListener('click', async () => {
+  const entries = sortedEntries(newsCache);
+  const newItem = {
+    title: 'New headline',
+    body: '',
+    date: new Date().toISOString().slice(0, 10),
+    link: '',
+    imageUrl: '',
+    order: entries.length,
+    createdAt: Date.now()
+  };
+  try {
+    await push(newsRef, newItem);
+    toast('News item added — edit it below');
+  } catch (err) {
+    toast('Could not add news item: ' + err.message, 'error');
+  }
+});
 </script>
 </body>
 </html>
